@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-class Index extends Admin
+class Index extends Base
 {
     public function index()
     {

@@ -1,10 +1,9 @@
 // /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
 
-var tabListObj;
-layui.use(["element", "layer", "tabList", "message", "contextMenu"], function () {
-   var layer = layui.layer;
-   var message = layui.message;
-   var tabList = layui.tabList({
+let tabListObj;
+layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
+   const kit = layui.kit;
+   const tabList = layui.tabList({
       // 菜单请求路径
       url: "/static/json/navs.json",
       // 允许同时选项卡的个数
@@ -56,22 +55,6 @@ layui.use(["element", "layer", "tabList", "message", "contextMenu"], function ()
                }
             }
          ]
-      });
-   });
-
-   /**系统设置*/
-   $("body").on("click", "#okSetting", function () {
-      layer.open({
-         type: 2,
-         title: "系统设置",
-         shadeClose: true,
-         closeBtn: 0, //不显示关闭按钮
-         skin: "slideInRight",
-         area: ['340px', '100%'],
-         offset: 'r', //右边
-         time: 200000, //2秒后自动关闭
-         anim: -1,
-         content: "./pages/system/setting.html"
       });
    });
 
@@ -140,7 +123,7 @@ layui.use(["element", "layer", "tabList", "message", "contextMenu"], function ()
    /**
     * tab左右移动
     */
-   $("body").on("click", ".okNavMove", function () {
+   $("body").on("click", ".tabMove", function () {
       var moveId = $(this).attr("data-id");
       var that = this;
       tabList.navMove(moveId, that);
@@ -240,7 +223,7 @@ layui.use(["element", "layer", "tabList", "message", "contextMenu"], function ()
     * 退出操作
     */
    $("#logout").click(function () {
-      message.confirm("确定要退出吗？", function (index) {
+      kit.confirm("确定要退出吗？", function (index) {
          tabList.removeTabStorage(function (res) {
             tabList.removeTabStorage();
             window.location = "pages/login.html";

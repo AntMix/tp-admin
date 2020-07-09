@@ -518,13 +518,17 @@
     font-style: normal;
 }
 
+.tab-list-title > li {
+    padding: 0 10px !important;
+}
+
 /*主体内容样式*/
 
 .admin .content-body {
     position: absolute;
     top: 50px;
     right: 0;
-    bottom: 42px;
+    bottom: 0px;
     left: 220px;
     z-index: 1;
     overflow: hidden
@@ -548,7 +552,7 @@
     width: 100%;
     padding: 0;
     overflow: hidden;
-    left: 0;
+    left: -1px;
     right: 0;
 }
 
