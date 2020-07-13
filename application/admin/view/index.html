@@ -10,6 +10,8 @@
 
    <link rel="shortcut icon" href="" type="image/x-icon" />
 
+   <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+
    <script type="text/javascript" src="/static/layui/layui.js"></script>
    <link rel="stylesheet" href="/static/layui/css/layui.css">
 
@@ -25,7 +27,7 @@
    <script src="/static/admin/admin.js"></script>
 </head>
 
-<body class="layui-layout-body" style="padding: 0;">
+<body style="padding: 0;">
    <!-- 更换主体 Eg:orange_theme|blue_theme -->
    <div class="layui-layout layui-layout-admin admin blue_theme">
       <!--头部导航-->
@@ -36,14 +38,13 @@
                   <i class="layui-icon layui-icon-shrink-right"></i>
                </a>
             </li>
-         </ul>
-         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">
                <a class="admin-refresh" href="javascript:" title="刷新">
                   <i class="layui-icon layui-icon-refresh-3"></i>
                </a>
             </li>
-
+         </ul>
+         <ul class="layui-nav layui-layout-right">
             <!-- 全屏 -->
             <li class="layui-nav-item layui-hide-xs">
                <a id="fullScreen" href="javascript:;">
@@ -115,16 +116,16 @@
             </div>
 
             <ul id="tabTitle" class="layui-tab-title tab-list-title not-scroll">
-               <li class="layui-this" lay-id="1" tab="index">
+               <!-- <li class="layui-this" lay-id="1" tab="index">
                   <i class="layui-icon layui-icon-home"></i>
                   <cite is-close=false>控制台</cite>
-               </li>
+               </li> -->
             </ul>
 
             <div id="tabContent" class="layui-tab-content tab-list-content">
-               <div class="layui-tab-item layui-show">
+               <!-- <div class="layui-tab-item layui-show">
                   <iframe src='index/console' frameborder="0" scrolling="yes" width="100%" height="100%"></iframe>
-               </div>
+               </div> -->
             </div>
          </div>
       </div>

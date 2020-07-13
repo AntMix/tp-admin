@@ -1,0 +1,81 @@
+{include file="base/header" /}
+<body>
+    <div class="page-content">
+        <form class="layui-form" id="form" lay-filter="form">
+            <input type="hidden" name="id" id="dataId" readonly class="layui-input" value="">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">控制器</label>
+                    <div class="layui-input-inline">
+                        <input type="tel" name="con" lay-verify="path" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">方法</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="func" lay-verify="path" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">父级</label>
+                <div class="layui-input-block">
+                    <select name="pid" lay-filter="select" lay-search="" id="pid">
+                        <option value="0">请选择父级</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">页面标识</label>
+                <div class="layui-input-block">
+                    <input type="text" name="sign" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否为菜单</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="is_menu" checked lay-skin="switch" value="1" lay-text="是|否">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="status" checked lay-skin="switch" value="1" lay-text="开启|关闭">
+                </div>
+            </div>
+
+            <button id="submit" class="layui-btn" lay-submit lay-filter="submit" style="display: none"></button>
+        </form>
+    </div>
+</body>
+<script>
+    const ID = getUrlParam('id')
+    const PID = getUrlParam('pid')
+    layui.use(['kit', 'form'], function () {
+        const kit = layui.kit
+        const form = layui.form
+
+        kit.formSelect(document.getElementById('pid'), './list?is_menu=1', {}, { value: 'id', title: 'name', selected: PID }, () => {
+            if (ID) {
+                kit.get('./info', { id: ID }, {msg: false}).done((res) => {
+                    form.val('form', res.data);
+                })
+            }
+        }, ID)
+        form.on('submit(submit)', function (data) {
+            kit.post('./save', data.field).done(() => {
+                kit.closeLayer(window.name)
+            })
+            return false;
+        });
+    });
+
+</script>
+{include file="base/footer" /}

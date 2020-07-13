@@ -10,6 +10,8 @@
       "title": "控制台示例",
       "href": "",
       "icon": "&#xe6b8;",
+      "spread": true,
+      "isCheck": true,
       "children": [
         {
           "title": "用户列表",

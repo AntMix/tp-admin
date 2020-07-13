@@ -16,7 +16,18 @@ class Base extends BaseController
      */
     public function response($code = 0, $data = [], $msg = '')
     {
-        echo json_encode(['code' => $code, 'data' => $data, 'msg' => $msg]);
+        if (!isset($data['total'])) {
+            echo json_encode(['code' => $code, 'data' => $data, 'msg' => $msg]);
+        } else {
+            echo json_encode([
+                'code' => $code,
+                'data' => $data['data'],
+                'msg' => $msg,
+                'count' => $data['total'],
+                'page' => $data['current_page'],
+                'limit' => $data['per_page']
+            ]);
+        }
     }
 
     public function success($data = [], $msg = '', $url = '', $wait = 0, $header = [])

@@ -1,5 +1,3 @@
-var $;
-var config;
 String.prototype.format = function () {
    //字符串占位符
    //eg: var str1 = "hello {0}".format("world");
@@ -53,10 +51,8 @@ function saveTabMenuFun($) {
    sessionStorage.setItem('tabMenu', tabMenu);
 }
 
-layui.define(["element", "jquery", "kit"], function (exports) {
+layui.define(["element", "jquery"], function (exports) {
    var layui = parent.layui || layui;
-   var kit = layui.kit;
-   $ = layui.jquery;
    var element = layui.element,
       layer = layui.layer;
 
@@ -343,7 +339,7 @@ layui.define(["element", "jquery", "kit"], function (exports) {
    };
 
    //重新对导航进行渲染(此处有个回调函数，主要用作渲染完成之后的操作)
-   tabList.prototype.render = function (callback) {
+   tabList.prototype.render = function (callback, reloadTab = true) {
       var _this = this;//data
       var _data = _this.tabConfig.data;
       if (_this.tabConfig.url) {
@@ -363,11 +359,13 @@ layui.define(["element", "jquery", "kit"], function (exports) {
             var lay_id = sessionStorage.getItem('lay-id');
             element.tabChange(_this.tabConfig.tabFilter, lay_id);
          });
-         /**打开缓存中的tab**/
-         OpenTabMenuFun($, function () {
-            // var filter = _this.tabConfig.tabFilter;
-            element.render("tab");
-         });
+         if (reloadTab) {
+            /**打开缓存中的tab**/
+            OpenTabMenuFun($, function () {
+               // var filter = _this.tabConfig.tabFilter;
+               element.render("tab");
+            });
+         }
       } else if ($.type(_data) == 'array') {
          if (_data.length < 1) {
             alert("菜单集合中无任何数据");

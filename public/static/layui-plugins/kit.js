@@ -1,71 +1,104 @@
 "use strict"
-layui.define(['layer'], function (exprots) {
-   const $ = layui.jquery
+layui.define(['layer', 'form'], function (exprots) {
+   const form = layui.form
    let kit = {
+      asyncOff: function () {
+         $.ajaxSetup({
+            async: false
+         });
+      },
+      reloadMenu: function (father = '') {
+         if (typeof parent.tabListObj != 'undefined') {
+            parent.tabListObj.render(null, false)
+            return true
+         } else if (father) {
+            if (typeof father.tabListObj != 'undefined') {
+               father.tabListObj.render(null, false)
+               return true
+            }
+         } else {
+            father = father ? father.parent : parent.parent
+            kit.reloadMenu(father)
+         }
+      },
+      dateTime: function (timestamp, format) {
+         return timestamp ? layui.util.toDateString(timestamp * 1000, format) : timestamp;
+      },
+      toDate: function (timestamp) {
+         return kit.dateTime(timestamp, 'yyyy-MM-dd')
+      },
+      toDateTime: function (timestamp) {
+         return kit.dateTime(timestamp, 'yyyy-MM-dd HH:mm:ss')
+      },
       successCode: 0,
       // msg弹窗默认消失时间
       msgTime: 800,
+      // 绿色勾
+      msg: function (content, options, callback) {
+         content !== '' && layer.msg(content, options, callback)
+      },
+      success: function (content, callback) {
+         kit.msg(content !== '' ? content : '操作成功', { icon: 1, time: kit.msgTime }, callback)
+      },
       // 红色叉
       error: function (content, callback) {
-         layer.msg(content ? content : '操作失败', { icon: 1, time: kit.msgTime }, callback)
-      },
-      // 绿色勾
-      success: function (content, callback) {
-         layer.msg(content ? content : '操作成功', { icon: 2, time: kit.msgTime }, callback)
+         kit.msg(content !== '' ? content : '操作失败', { icon: 2, time: kit.msgTime }, callback)
       },
       // 黄色问号
       question: function (content, callback) {
-         layer.msg(content ? content : '确认操作', { icon: 3, time: kit.msgTime }, callback)
+         kit.msg(content ? content : '', { icon: 3, time: kit.msgTime }, callback)
       },
       // 灰色锁
       lock: function (content, callback) {
-         layer.msg(content ? content : '操作锁定', { icon: 4, time: kit.msgTime }, callback)
+         kit.msg(content ? content : '', { icon: 4, time: kit.msgTime }, callback)
       },
       // 红色哭脸
       cry: function (content, callback) {
-         layer.msg(content ? content : '操作失败', { icon: 5, time: kit.msgTime }, callback)
+         kit.msg(content ? content : '', { icon: 5, time: kit.msgTime }, callback)
       },
       // 绿色笑脸
       laugh: function (content, callback) {
-         layer.msg(content ? content : '操作成功', { icon: 6, time: kit.msgTime }, callback)
+         kit.msg(content ? content : '', { icon: 6, time: kit.msgTime }, callback)
       },
       // 黄色感叹号
       sign: function (content, callback) {
-         layer.msg(content ? content : '禁止操作', { icon: 7, time: kit.msgTime }, callback)
+         layer.msg(content ? content : '', { icon: 7, time: kit.msgTime }, callback)
+      },
+      closeLayer: function (name) {
+         typeof window.submitCallback == 'function' && window.submitCallback()
+         parent.layer.close(parent.layer.getFrameIndex(name))
       },
       /**
        * ajax()函数二次封装
        * @param {string} url 地址
        * @param {string} type 类型
        * @param {object} params 参数
-       * @param {boolean} load 遮罩
-       * @param {boolean} showMsg 显示返回信息
+       * @param {object} options { load: true, msg: true }
        * @returns {*|never|{always, promise, state, then}}
        */
-      ajax: function (url, type, params, load = true, showMsg = true) {
-         var deferred = $.Deferred()
-         var loadIndex
+      ajax: function (url, type, params, options = {}) {
+         let deferred = $.Deferred()
+         let loadIndex
+         options = Object.assign({ load: true, msg: true }, options)
          $.ajax({
             url: url,
             type: type || "get",
             data: params || {},
             dataType: "json",
             beforeSend: function () {
-               if (load) {
-                  loadIndex = layer.load(0, { shade: 0.3 })
+               if (options.load) {
+                  loadIndex = layer.load(2, { shade: 0.2 })
                }
             },
             success: function (data) {
-               if (data.code !== kit.code) {
-                  showMsg && kit.success(data.msg)
-                  deferred.resolve(data)
+               if (data.code === kit.successCode) {
+                  options.msg ? kit.success(data.msg, () => { deferred.resolve(data) }) : deferred.resolve(data)
                } else {
-                  showMsg && kit.error(data.msg)
-                  deferred.reject(data.msg)
+                  options.msg ? kit.error(data.msg, () => { deferred.reject(data) }) : deferred.reject(data)
                }
             },
             complete: function () {
-               if (load) {
+               if (options.load) {
                   layer.close(loadIndex)
                }
             },
@@ -77,17 +110,17 @@ layui.define(['layer'], function (exprots) {
          })
          return deferred.promise()
       },
-      get: function (url, params, load = true, showMsg = true) {
-         return kit.ajax(url, 'get', params, load, showMsg)
+      get: function (url, params, options) {
+         return kit.ajax(url, 'get', params, options)
       },
-      post: function (url, params, load = true, showMsg = true) {
-         return kit.ajax(url, 'post', params, load, showMsg)
+      post: function (url, params, options) {
+         return kit.ajax(url, 'post', params, options)
       },
-      put: function (url, params, load = true, showMsg = true) {
-         return kit.ajax(url, 'put', params, load, showMsg)
+      put: function (url, params, options) {
+         return kit.ajax(url, 'put', params, options)
       },
-      delete: function (url, params, load = true, showMsg = true) {
-         return kit.ajax(url, 'delete', params, load, showMsg)
+      delete: function (url, params, options) {
+         return kit.ajax(url, 'delete', params, options)
       },
       /**
        * confirm()函数二次封装
@@ -109,19 +142,19 @@ layui.define(['layer'], function (exprots) {
             })
          })
       },
-      edit: function (title = '', url = '404.html', id, options = {
-         btn: [],
-         btnCallback: {},
-         width: 0.8,
-         height: 0.8,
-         shadow: false
-      }) {
+      open: function (title = '', url = '404.html', options = {}, submitCallback, pageCallback) {
+         options = Object.assign({
+            btn: [],
+            btnCallback: {},
+            width: 0.8,
+            height: 0.8,
+            shadow: false,
+         }, options)
          options.width = options.width > 1 ? options.width : $(window).width() * options.width
          options.height = options.height > 1 ? options.height : $(window).height() * options.height
          options.btn.length === 0 && (options.btn = ['确定', '取消'])
          options.shade === false ? options.shade = false : options.shade = 0.4
          let layerOption = {
-            id: id,
             title: title,
             btn: options.btn,
             content: url,
@@ -129,7 +162,7 @@ layui.define(['layer'], function (exprots) {
             maxmin: true,
             shade: options.shadow,
             area: [options.width + 'px', options.height + 'px'],
-            // zIndex: layer.zIndex,
+            zIndex: layer.zIndex,
             fix: false,
             shadeClose: false,
             yes: (index) => {
@@ -139,30 +172,79 @@ layui.define(['layer'], function (exprots) {
                layer.closeAll()
             },
             success: function (layero, index) {
-               if (id) {
-                  let body = layer.getChildFrame('body', index)
-                  body.contents().find("#dataId").val(id)
+               // 页面初始化成功
+               var iframeWin = window[layero.find('iframe')[0]['name']]
+               typeof iframeWin.initFrame == 'function' && iframeWin.initFrame()
+               if (typeof pageCallback == "function") {
+                  pageCallback(iframeWin);
+               }
+               if (typeof submitCallback == "function") {
+                  iframeWin.submitCallback = () => {
+                     submitCallback()
+                  };
                }
             }, error: function (layero, index) {
-               console.log('open iframe error')
+               // 页面初始化失败
+               console.log('Open Error')
             }
          }
          layerOption = Object.assign(layerOption, options.btnCallback);
          layer.open(layerOption)
-      }, show: function (title = '', url = '404.html', id, options = {
-         btn: false,
-         shadow: 0.4,
-         width: 0.8,
-         height: 0.8,
-      }) {
-         kit.edit(title, url, id, options)
+      },
+      edit: function (title = '', url = '404.html', submitCallback, pageCallback) {
+         let options = { btn: [], btnCallback: {}, width: 0.8, height: 0.8, shadow: false }
+         kit.open(title, url, options, submitCallback, pageCallback)
+      },
+      show: function (title = '', url = '404.html', submitCallback, pageCallback) {
+         let options = { btn: false, shadow: 0.4, width: 0.8, height: 0.8 }
+         kit.open(title, url, options, submitCallback, pageCallback)
+      },
+      // 表单操作
+      formSwitch: function (url, params, obj, callback = (res) => { }) {
+         kit.post(url, params).done((res) => {
+            callback(res)
+         }).fail((error) => {
+            obj.elem.checked = !obj.elem.checked;
+            form.render();
+         })
+      },
+      /**
+       * 初始化下拉框
+       * @param {object} element
+       * @param {string} url
+       * @param {object} params
+       * @param {object} parseData { value: 'id', title: 'name' }
+       * @param {function} callback
+       * @param {object} callbackParams
+       */
+      formSelect: function (element, url, params, parseData = {}, callback, callbackParams) {
+         kit.post(url, params, false, false).done((res) => {
+            let html = kit.makeOption(res.data, parseData)
+            element.insertAdjacentHTML('beforeend', html)
+            if (typeof callback == 'function') {
+               callback(callbackParams)
+            }
+            form.render()
+         })
+      },
+      makeOption: function (data, parseData = {}) {
+         parseData = Object.assign({ value: 'id', title: 'name' }, parseData)
+         let html = ''
+         for (let item of Object.values(data)) {
+            if (parseData.selected == item[parseData.value]) {
+               html += `<option value="${item[parseData.value]}" selected>${item[parseData.title]}</option>`
+            } else {
+               html += `<option value="${item[parseData.value]}">${item[parseData.title]}</option>`
+            }
+         }
+         return html
       },
       /**
        * 主要用于对ECharts视图自动适应宽度
        * @param {object} EChartsElement
        */
       EChartsResize: function (element) {
-         var element = element || []
+         element = element || []
          window.addEventListener("resize", function () {
             for (let i = 0; i < element.length; i++) {
                element[i].resize()
@@ -175,11 +257,11 @@ layui.define(['layer'], function (exprots) {
        * @returns {string}
        */
       tableBatchCheck: function (table) {
-         var checkStatus = table.checkStatus("tableId")
-         var rows = checkStatus.data.length
+         let checkStatus = table.checkStatus("tableId")
+         let rows = checkStatus.data.length
          if (rows > 0) {
-            var idsStr = ""
-            for (var i = 0; i < checkStatus.data.length; i++) {
+            let idsStr = ""
+            for (let i = 0; i < checkStatus.data.length; i++) {
                idsStr += checkStatus.data[i].id + ","
             }
             return idsStr
@@ -187,11 +269,7 @@ layui.define(['layer'], function (exprots) {
             layer.msg("未选择有效数据", { offset: "t", anim: 6 })
          }
       },
-      getUrlParam: function (name) {
-         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)")
-         var r = window.location.search.substr(1).match(reg)
-         if (r != null) return decodeURI(r[2]); return null
-      },
+
       imgUpload: function (upload, url = '/hospital/method-upload', data = null) {
          let load = null
          upload.render({

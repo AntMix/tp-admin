@@ -1,3 +1,41 @@
 body {
     padding: 2px 0 0 0;
 }
+.page-content{
+    padding: 5px;
+}
+.form-search {
+    margin-top: 10px
+}
+
+.form-search .layui-input {
+    width: 200px;
+    margin: 0 0px 5px 10px;
+    float: left;
+}
+
+.form-search .layui-btn {
+    margin-left: 10px
+}
+
+@media screen and (max-width:768px) {
+    .form-search .layui-input {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px
+    }
+    .form-search .layui-btn {
+        margin-left: 0;
+        margin-top: 10px
+    }
+}
+
+.btn-add {
+    float: right;
+}
+.layui-tab-close {
+    border-radius: 20px;
+}
+.power-item {
+    display: none;
+}

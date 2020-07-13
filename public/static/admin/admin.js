@@ -1,22 +1,37 @@
 // /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
 
-let tabListObj;
+var tabListObj;
+const defaultIcon = 'layui-icon-home'
+const defaultTitle = '默认标题'
 layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
    const kit = layui.kit;
+
+   function getTableData(data, keys) {
+      for (let value of Object.values(data)) {
+         keys.title && (value.title = value[keys.title])
+         !value.title && (value.title = defaultTitle + '_' + keys)
+         keys.icon && (value.icon = value[keys.icon])
+         !value.icon && (value.icon = defaultIcon)
+         keys.spread && (value.spread = value[keys.spread])
+         if (value[keys.children]) {
+            value.children = getTableData(value[keys.children], keys)
+         }
+      }
+      return data
+   };
    const tabList = layui.tabList({
       // 菜单请求路径
-      url: "/static/json/navs.json",
+      url: "/admin/index/menu",
       // 允许同时选项卡的个数
       openTabNum: 30,
-      // 如果返回的结果和navs.json中的数据结构一致可省略这个方法
-      parseData: function (data) {
-         return data;
+      parseData: function (res) {
+         res = JSON.parse(res)
+         localStorage.setItem('powerList', JSON.stringify(res.data.power))
+         return getTableData(res.data.menu, { title: 'name', icon: 'icon', spread: 'open', children: 'children' })
       }
    });
-   tabListObj = tabList;
-   /**关闭加载动画*/
-   okLoading && okLoading.close();
 
+   tabListObj = tabList;
    /**
     * 左侧导航渲染完成之后的操作
     */
@@ -57,10 +72,9 @@ layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
          ]
       });
    });
-
    /**
     * 添加新窗口
-    */
+   */
    $("body").on("click", "#navBar .layui-nav-item a, #userInfo a", function () {
       // 如果不存在子级
       if ($(this).siblings().length == 0) {
@@ -75,6 +89,9 @@ layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
       }
    });
 
+   /**关闭加载动画*/
+   okLoading && okLoading.close();
+
    /**
     * 左侧菜单展开动画
     */
@@ -83,15 +100,15 @@ layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
          var superEle = $(this).parent();
          var ele = $(this).next('.layui-nav-child');
          var height = ele.height();
-         ele.css({"display": "block"});
+         ele.css({ "display": "block" });
          // 是否是展开状态
          if (superEle.is(".layui-nav-itemed")) {
             ele.height(0);
-            ele.animate({height: height + "px"}, function () {
-               ele.css({height: "auto"});
+            ele.animate({ height: height + "px" }, function () {
+               ele.css({ height: "auto" });
             });
          } else {
-            ele.animate({height: 0}, function () {
+            ele.animate({ height: 0 }, function () {
                ele.removeAttr("style");
             });
          }
