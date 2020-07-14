@@ -14,10 +14,10 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">昵称</label>
                 <div class="layui-input-block">
-                    <input type="text" name="nick" lay-verify="name" required class="layui-input">
+                    <input type="text" name="nick" lay-verify="nick" required class="layui-input">
                 </div>
             </div>
-            <div class="layui-form-item">
+            <div class="layui-form-item" id="pass" style="display: none;">
                 <div class="layui-inline">
                     <label class="layui-form-label">密码</label>
                     <div class="layui-input-inline">
@@ -64,7 +64,7 @@
 <script src="/static/layui-plugins/xm-select.js"></script>
 <script>
     const ID = getUrlParam('id')
-    layui.use(['kit', 'form', 'xm-select'], function () {
+    layui.use(['kit', 'form'], function () {
         const kit = layui.kit
         const form = layui.form
 
@@ -72,14 +72,22 @@
             kit.get('./info', { id: ID }, { msg: false }).done((res) => {
                 form.val('form', res.data);
             })
+        } else {
+            document.getElementById('pass').style.display = 'block'
         }
+        let roleSelect = {};
         kit.get('./role', { id: ID }, { msg: false }).done((res) => {
-            xmSelect.render({
+            roleSelect = xmSelect.render({
                 el: '#role',
-                data: res.data
+                tips: '请选择角色',
+                filterable: true,
+                searchTips: '输入搜索',
+                data: res.data.list,
+                initValue: res.data.checked
             })
         })
         form.on('submit(submit)', function (data) {
+            data.field.role = roleSelect.getValue('valueStr');
             kit.post('./save', data.field).done(() => {
                 kit.closeLayer(window.name)
             })
@@ -87,7 +95,7 @@
         });
         form.verify({
             name: (value, item) => { //value：表单的值、item：表单的DOM对象
-                if (!new RegExp("^[a-zA-Z0-9_\s]+$").test(value)) {
+                if (!new RegExp("^[a-zA-Z0-9_\S]+$").test(value)) {
                     return '由英文字母下划线构成'
                 }
                 if (/(^\_)|(\__)|(\_+$)/.test(value)) {
@@ -96,6 +104,11 @@
                 if (/^\d+\d+\d$/.test(value)) {
                     return '用户名不能全为数字'
                 }
+                if (value.length > 20) {
+                    return '用户名不能超过20个字符'
+                }
+            },
+            nick: (value, item) => {
                 if (value.length > 20) {
                     return '用户名不能超过20个字符'
                 }

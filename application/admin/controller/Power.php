@@ -68,8 +68,10 @@ class Power extends Base
             'status' => $this->request->post('status', 0)
         ];
         if ($id) {
+            $data['update_time'] = time();
             $res = Db::name('admin_power')->where('id', $id)->update($data);
         } else {
+            $data['create_time'] = time();
             $res = Db::name('admin_power')->insertGetId($data);
         }
         if ($res !== false) {
@@ -83,9 +85,10 @@ class Power extends Base
     {
         $id = $this->request->post('id');
         $item = Db::name('admin_power')->where(['id' => $id])->find();
-        $update = ['status' => -1];
+        $updateTime = time();
+        $update = ['status' => -1, 'update_time' => $updateTime];
         if (!$item) {
-            return $this->error([], '没有此记录');
+            return $this->error('没有此记录');
         }
         Db::startTrans();
         $res = Db::name('admin_power')->where(['id' => $id])->update($update);

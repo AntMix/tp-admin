@@ -1,0 +1,81 @@
+{include file="base/header" /}
+
+<body>
+    <div class="page-content">
+        <form class="layui-form" id="form" lay-filter="form">
+            <input type="hidden" name="id" id="dataId" readonly class="layui-input" value="">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" required class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限列表</label>
+                <div class="layui-input-block dtree" id="power" data-id="0">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="status" checked lay-skin="switch" value="1" lay-text="开启|关闭">
+                </div>
+            </div>
+
+            <button id="submit" class="layui-btn" lay-submit lay-filter="submit" style="display: none"></button>
+        </form>
+    </div>
+</body>
+<link rel="stylesheet" href="/static/layui-plugins/dtree/font/dtreefont.css">
+<link rel="stylesheet" href="/static/layui-plugins/dtree/dtree.css">
+
+<script>
+    const ID = getUrlParam('id')
+    layui.use(['kit', 'form', 'dtree'], function () {
+        const kit = layui.kit
+        const form = layui.form
+        const dtree = layui.dtree
+        const powerId = 'power'
+
+        if (ID) {
+            kit.get('./info', { id: ID }, { msg: false }).done((res) => {
+                form.val('form', res.data);
+            })
+        }
+        kit.get('./power', { id: ID }, { msg: false }).done((res) => {
+            let elementId = ''
+            dtree.render({
+                elem: '#' + powerId,
+                data: res.data.list,
+                dataStyle: 'layuiStyle',
+                dataFormat: "list",
+                initLevel: 5,
+                response: { message: 'msg', statusCode: 0, parentId: 'pid', title: 'name' },
+                checkbar: true,
+                checkbarType: "self",
+                menubar: true,
+                menubarTips: {
+                    group: ["moveDown", "moveUp", "refresh", "checkAll", "unCheckAll", "invertAll"]
+                },
+                done: function (result, $ul, first) {
+                    if (first) {
+                        dtree.chooseDataInit(powerId, res.data.checked.join(','))
+                    }
+                }
+            });
+        })
+        form.on('submit(submit)', function (data) {
+            let powerArr = dtree.getCheckbarNodesParam(powerId);
+            let ids = powerArr.map(item => item.nodeId)
+            data.field.power = ids.join(',')
+            kit.post('./save', data.field).done(() => {
+                kit.closeLayer(window.name)
+            })
+            return false;
+        });
+    });
+
+</script>
+{include file="base/footer" /}

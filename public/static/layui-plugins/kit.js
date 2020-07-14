@@ -218,7 +218,7 @@ layui.define(['layer', 'form'], function (exprots) {
        * @param {object} callbackParams
        */
       formSelect: function (element, url, params, parseData = {}, callback, callbackParams) {
-         kit.post(url, params, false, false).done((res) => {
+         kit.post(url, params, {msg : false}).done((res) => {
             let html = kit.makeOption(res.data, parseData)
             element.insertAdjacentHTML('beforeend', html)
             if (typeof callback == 'function') {

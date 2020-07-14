@@ -37,6 +37,7 @@ class Base extends BaseController
 
     public function error($data = [], $msg = '', $url = '', $wait = 0, $header = [])
     {
-        $this->response(400, $data, $msg);
+        is_string($data) && $msg = $data;
+        $this->response(400, [], $msg);
     }
 }
