@@ -21,7 +21,7 @@
 			</form>
 		</div>
 		<!--数据表格-->
-		<table class="layui-hide" id="tableId" lay-filter="tableId"></table>
+		<table class="layui-hide" id="tableId" lay-filter="tableId" style="color: #dadada4f;"></table>
 	</div>
 </body>
 <!-- 头工具栏模板 -->
@@ -60,11 +60,12 @@
 			cols: [[
 				{ type: 'checkbox', fixed: 'left' },
 				{ field: 'id', title: 'ID', width: 80, sort: true },
-				{ field: 'name', title: '姓名', width: 100 },
-				{ field: 'nick', title: '昵称', width: 100 },
-				{ field: 'role', title: '角色', width: 100, templet: '#roleTpl' },
+				{ field: 'name', title: '姓名' },
+				{ field: 'nick', title: '昵称' },
+				{ field: 'role', title: '角色', templet: '#roleTpl' },
 				{ field: 'status', title: '状态', width: 100, templet: '#statusTpl' },
-				{ field: 'email', title: '邮箱', width: 200 },
+				{ field: 'phone', title: '手机' },
+				{ field: 'email', title: '邮箱' },
 				{ field: 'create_time', title: '创建时间', width: 160, templet: "<div>{{layui.kit.toDateTime(d.create_time)}}</div>" },
 				{ field: 'update_time', title: '更新时间', width: 160, templet: "<div>{{layui.kit.toDateTime(d.update_time)}}</div>" },
 				{ title: '操作', width: 120, align: 'center', fixed: 'right', templet: '#operationTpl' }

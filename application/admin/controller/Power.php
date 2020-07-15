@@ -63,10 +63,17 @@ class Power extends Base
             'con' => $this->request->post('con'),
             'func' => $this->request->post('func'),
             'pid' => $this->request->post('pid'),
+            'icon' => $this->request->post('icon'),
             'sign' => $this->request->post('sign'),
             'is_menu' => $this->request->post('is_menu', 0),
             'status' => $this->request->post('status', 0)
         ];
+        if ($data['pid']) {
+            $parent = Db::name('admin_power')->where('id', $data['pid'])->where('is_menu', 1)->find();
+            if (!$parent) {
+                return $this->error();
+            }
+        }
         if ($id) {
             $data['update_time'] = time();
             $res = Db::name('admin_power')->where('id', $id)->update($data);

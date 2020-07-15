@@ -72,8 +72,7 @@
             kit.get('./info', { id: ID }, { msg: false }).done((res) => {
                 form.val('form', res.data);
             })
-        } else {
-            document.getElementById('pass').style.display = 'block'
+            document.getElementById('pass').remove()
         }
         let roleSelect = {};
         kit.get('./role', { id: ID }, { msg: false }).done((res) => {

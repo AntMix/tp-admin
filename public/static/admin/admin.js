@@ -6,7 +6,7 @@ const defaultTitle = '默认标题'
 layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
    const kit = layui.kit;
 
-   function getTableData(data, keys) {
+   function getMenuData(data, keys) {
       for (let value of Object.values(data)) {
          keys.title && (value.title = value[keys.title])
          !value.title && (value.title = defaultTitle + '_' + keys)
@@ -14,7 +14,7 @@ layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
          !value.icon && (value.icon = defaultIcon)
          keys.spread && (value.spread = value[keys.spread])
          if (value[keys.children]) {
-            value.children = getTableData(value[keys.children], keys)
+            value.children = getMenuData(value[keys.children], keys)
          }
       }
       return data
@@ -27,7 +27,7 @@ layui.use(["element", "layer", "tabList", "kit", "contextMenu"], function () {
       parseData: function (res) {
          res = JSON.parse(res)
          localStorage.setItem('powerList', JSON.stringify(res.data.power))
-         return getTableData(res.data.menu, { title: 'name', icon: 'icon', spread: 'open', children: 'children' })
+         return getMenuData(res.data.menu, { title: 'name', icon: 'icon', spread: 'open', children: 'children' })
       }
    });
 

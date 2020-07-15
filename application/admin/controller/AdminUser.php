@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use think\Db;
+use app\admin\model\Auth as AuthModel;
 
 class AdminUser extends Base
 {
@@ -22,7 +23,7 @@ class AdminUser extends Base
         $email = $this->request->get('email');
         $startTime = $this->request->get('start_time');
         $endTime = $this->request->get('end_time');
-        $queryTime = $this->queryTime($startTime, $endTime, 'create_time');
+        $queryTime = \Util::queryTime($startTime, $endTime, 'create_time');
         $where = [];
         $name && $where['name'] = ['like' , "%$name%"];
         $nick && $where['nick'] = ['like' , "%$nick%"];
@@ -31,6 +32,10 @@ class AdminUser extends Base
         $queryTime && $where['create_time'] = $queryTime;
         $id && $where = ['id' => $id];
         $data = Db::name('admin_user')->where($where)->page($page)->paginate($limit)->toArray();
+        foreach ($data['data'] as &$value) {
+            $value['role'] = Db::name('admin_role_user')->alias('ru')->join('admin_role r', 'ru.role_id = r.id', 'left')->where('ru.uid', $value['id'])->column('r.name');
+            $value['role'] = $value['role'] ? implode(' | ', $value['role']) : '';
+        }
         $this->success($data);
     }
 
@@ -58,10 +63,10 @@ class AdminUser extends Base
         ];
         $role = $this->request->post('role');
         $role && $role = explode(',', $role);
-        if (!Auth::checkNameFormat($data['name'])) {
+        if (!AuthModel::checkNameFormat($data['name'])) {
             return $this->error('用户名格式错误');
         }
-        if (!Auth::checkNickFormat($data['nick'])) {
+        if (!AuthModel::checkNickFormat($data['nick'])) {
             return $this->error('昵称格式错误');
         }
         $time = time();
@@ -69,10 +74,10 @@ class AdminUser extends Base
         $res1 = $res2 = $res3 = false;
         if ($id) {
             $data['update_time'] = $time;
-            $res1 = Db::name('admin_user')->update($data);
+            $res1 = Db::name('admin_user')->where('id', $id)->update($data);
         } else {
             $data['create_time'] = $time;
-            $data['password'] = Auth::password($this->request->post('password'));
+            $data['password'] = AuthModel::password($this->request->post('password'));
             if (!$data['password']) {
                 return $this->error('密码格式错误');
             }
@@ -152,11 +157,11 @@ class AdminUser extends Base
             $this->error('没有查询到此用户');
         }
         $oldPass = $this->request->post('old_pass');
-        if (!Auth::password($oldPass, $user['password'])) {
+        if (!AuthModel::password($oldPass, $user['password'])) {
             $this->error('旧密码错误');
         }
         $password = $this->request->post('password');
-        $password = Auth::password($password);
+        $password = AuthModel::password($password);
         if (!$password) {
             return $this->error('密码格式错误');
         }

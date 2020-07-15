@@ -2,42 +2,39 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\AdminUser;
+use app\admin\model\Auth as AuthModel;
 use app\common\controller\BaseController;
+use JWT;
 
 class Base extends BaseController
 {
-    /**
-     * 响应
-     *
-     * @param integer $code 0:Success 400:Error 401:Unauthorized 403:Forbidden
-     * @param array|object $data
-     * @param string $msg
-     * @return void
-     */
-    public function response($code = 0, $data = [], $msg = '')
+    protected $uid = 0;
+    protected $user = [];
+
+    public function _initialize()
     {
-        if (!isset($data['total'])) {
-            echo json_encode(['code' => $code, 'data' => $data, 'msg' => $msg]);
-        } else {
-            echo json_encode([
-                'code' => $code,
-                'data' => $data['data'],
-                'msg' => $msg,
-                'count' => $data['total'],
-                'page' => $data['current_page'],
-                'limit' => $data['per_page']
-            ]);
+        $this->_initUser();
+    }
+
+    protected function _initUser()
+    {
+        $loginPage = '/admin/auth/login';
+        $token = $this->request->cookie(AuthModel::COOKIE_NAME);
+        if(!$token){
+            $this->redirect($loginPage);
         }
-    }
-
-    public function success($data = [], $msg = '', $url = '', $wait = 0, $header = [])
-    {
-        $this->response(0, $data, $msg);
-    }
-
-    public function error($data = [], $msg = '', $url = '', $wait = 0, $header = [])
-    {
-        is_string($data) && $msg = $data;
-        $this->response(400, [], $msg);
+        $info = JWT::verifyToken($token);
+        if (isset($info['uid']) && $info['uid']){
+            $user = AdminUser::getNormalUser($info['uid']);
+            if (!$user) {
+                $this->redirect($loginPage);
+            }
+            $user = AdminUser::dealInfo($user);
+        }
+        if ($user) {
+            $this->uid = $user['uid'];
+            $this->user = $user;
+        }
     }
 }

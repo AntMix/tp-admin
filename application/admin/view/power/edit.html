@@ -1,4 +1,5 @@
 {include file="base/header" /}
+
 <body>
     <div class="page-content">
         <form class="layui-form" id="form" lay-filter="form">
@@ -39,6 +40,12 @@
                 </div>
             </div>
             <div class="layui-form-item">
+                <label class="layui-form-label">图标</label>
+                <div class="layui-input-block">
+                    <input type="text" id="icon" name="icon" lay-filter="icon" value="" style="display:none;">
+                </div>
+            </div>
+            <div class="layui-form-item">
                 <label class="layui-form-label">是否为菜单</label>
                 <div class="layui-input-block">
                     <input type="checkbox" name="is_menu" checked lay-skin="switch" value="1" lay-text="是|否">
@@ -58,17 +65,27 @@
 <script>
     const ID = getUrlParam('id')
     const PID = getUrlParam('pid')
-    layui.use(['kit', 'form'], function () {
+    layui.use(['kit', 'form', 'iconPicker'], function () {
         const kit = layui.kit
         const form = layui.form
+        const iconPicker = layui.iconPicker
+
+        iconPicker.render({
+            elem: '#icon',
+            type: 'fontClass',
+            search: true,
+            page: false
+        });
 
         kit.formSelect(document.getElementById('pid'), './list?is_menu=1', {}, { value: 'id', title: 'name', selected: PID }, () => {
             if (ID) {
-                kit.get('./info', { id: ID }, {msg: false}).done((res) => {
+                kit.get('./info', { id: ID }, { msg: false }).done((res) => {
+                    iconPicker.checkIcon('icon', res.data.icon);
                     form.val('form', res.data);
                 })
             }
         }, ID)
+
         form.on('submit(submit)', function (data) {
             kit.post('./save', data.field).done(() => {
                 kit.closeLayer(window.name)

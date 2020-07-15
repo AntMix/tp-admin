@@ -238,4 +238,11 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
+
+    'http_exception_template'    =>  [
+        // 定义404错误的重定向页面地址
+        404 =>  ROOT_PATH . 'public' . DS . '/404.html',
+        // 还可以定义其它的HTTP status
+        // 401 =>  APP_PATH . '401.html',
+    ]
 ];

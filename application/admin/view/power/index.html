@@ -53,7 +53,10 @@
 				arrowType: 'arrow2',   // 自定义箭头风格
 				getIcon: function (d) {  // 自定义图标
 					// d是当前行的数据
-					if (d.children) {  // 判断是否有子集
+					if (d.icon) {
+						return `<i class="layui-icon ${d.icon}"></i>`
+					}
+					if (d.children || d.is_menu) {  // 判断是否有子集
 						return '<i class="ew-tree-icon ew-tree-icon-folder"></i>';
 					} else {
 						return '<i class="ew-tree-icon ew-tree-icon-file"></i>';

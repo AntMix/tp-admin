@@ -2,40 +2,27 @@
 
 namespace app\admin\controller;
 
-class Auth
+use app\common\controller\BaseController;
+
+class Auth extends BaseController
 {
-    const SALT = 'adminSalt';
 
-    public static function password($pass, $vPass = '')
+    public function login()
     {
-        if (self::checkPassFormat($pass)) {
-            $pass = md5(md5($pass . '@' . self::SALT));
-            return $vPass ? $vPass === $pass ? true : false : $pass;
-        }
-        return false;
+        return $this->fetch('auth/login');
     }
 
-    public static function checkNameFormat($name)
+    public function doLogin()
     {
-        if (preg_match("/^[A-Za-z0-9_\S]{5,20}+$/", $name)) {
-            return true;
+        $name = $this->request->post('name');
+        $password = $this->request->post('password');
+        if (!$name || !$password) {
+            return $this->error('参数错误');
         }
-        return false;
-    }
-
-    public static function checkNickFormat($nick)
-    {
-        if (mb_strlen($nick) <= 20) {
-            return true;
+        $user = \app\admin\model\Auth::login($name, $password);
+        if ($user) {
+            return $this->success($user, '登录成功');
         }
-        return false;
-    }
-
-    public static function checkPassFormat($pass)
-    {
-        if (preg_match("/^[\S]{6,12}$/", $pass)) {
-            return true;
-        }
-        return false;
+        return $this->error('登录失败，用户名和密码不正确');
     }
 }
