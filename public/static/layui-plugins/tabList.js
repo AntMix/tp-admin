@@ -19,7 +19,7 @@ String.prototype.format = function () {
 
 /**打开缓存中的tabMenu**/
 let OpenTabMenuFun = function ($, callback) {
-   var tabMenu = sessionStorage.getItem("tabMenu");//已经打开的tab页面
+   var tabMenu = sessionStorage.getItem(window.config.tabMenuName);//已经打开的tab页面
    if (tabMenu) {
       tabMenu = JSON.parse(tabMenu);
       $("#tabTitle").html(tabMenu.tabTitle);
@@ -32,9 +32,8 @@ let OpenTabMenuFun = function ($, callback) {
 
 /**删除缓存中的tabMenu**/
 let removeTabMenu = function (tabList, callback) {
-   sessionStorage.removeItem("tabMenu");
-   sessionStorage.removeItem("notice");
-   sessionStorage.removeItem("lay-id");
+   sessionStorage.removeItem(window.config.tabMenuName);
+   sessionStorage.removeItem(window.config.layIdName);
    if (typeof callback == "function") {
       callback(tabList);
    }
@@ -48,7 +47,7 @@ function saveTabMenuFun($) {
       tabTitle: tabTitle.html(),
       tabContent: $("#tabContent").html()
    });
-   sessionStorage.setItem('tabMenu', tabMenu);
+   sessionStorage.setItem(window.config.tabMenuName, tabMenu);
 }
 
 layui.define(["element", "jquery"], function (exports) {
@@ -97,7 +96,7 @@ layui.define(["element", "jquery"], function (exports) {
          } else {
             ulItem += '<li class="layui-nav-item">';
          }
-         createMenu(data[i], (i + 1).toString());
+         createMenu(data[i], data[i].id);
          ulItem += temp;
          ulItem += '</li>';
       }
@@ -133,7 +132,7 @@ layui.define(["element", "jquery"], function (exports) {
          temp += '<dl class="layui-nav-child">';
          for (var i = 0; i < data.children.length; i++) {
             temp += '<dd>';
-            var lay_id = tabID + "-" + (i + 1);
+            var lay_id = tabID + "-" + data.children[i].id;
             createMenu(data.children[i], lay_id);
             temp += '</dd>';
          }
@@ -250,7 +249,7 @@ layui.define(["element", "jquery"], function (exports) {
          //    $(".tab-list-content .layui-show").find("iframe")[0].contentWindow.location.reload(true);
          // }
          var index = data.index;//点击的某个tab索引
-         sessionStorage.setItem('lay-id', this.getAttribute('lay-id'));
+         sessionStorage.setItem(window.config.layIdName, this.getAttribute('lay-id'));
          var elSuper = $(".tab-list"),//视窗元素
             elMove = $(".tab-list-title"),//移动的元素
             elTabs = $(".tab-list-title li"),//所有已存在的tab集合
@@ -356,7 +355,7 @@ layui.define(["element", "jquery"], function (exports) {
             if (typeof callback == "function") {
                callback();
             }
-            var lay_id = sessionStorage.getItem('lay-id');
+            var lay_id = sessionStorage.getItem(window.config.layIdName);
             element.tabChange(_this.tabConfig.tabFilter, lay_id);
          });
          if (reloadTab) {

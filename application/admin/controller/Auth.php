@@ -21,7 +21,7 @@ class Auth extends BaseController
         }
         $user = \app\admin\model\Auth::login($name, $password);
         if ($user) {
-            return $this->success($user, '登录成功');
+            return $this->success(['link' => '/admin/index', 'user' => $user], '登录成功');
         }
         return $this->error('登录失败，用户名和密码不正确');
     }

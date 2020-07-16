@@ -13,9 +13,17 @@ class Index extends Base
 
     public function menu()
     {
-        $menu = Db::name('admin_power')->where(['status' => 1, 'is_menu' => 1])->select();
+        $roleIds = Db::name('admin_role_user')->where('uid', $this->uid)->where('status', 1)->column('role_id');
+        if (!$roleIds) {
+            return $this->error('异常：没有设置角色组');
+        }
+        $powerIds = Db::name('admin_role_power')->whereIn('role_id', $roleIds)->column('power_id');
+        if (!$powerIds) {
+            return $this->error('异常：没有设置角色组菜单');
+        }
+        $menu = Db::name('admin_power')->where(['status' => 1, 'is_menu' => 1])->whereIn('id', $powerIds)->select();
         $menu = $this->getMenu($menu);
-        $power = Db::name('admin_power')->where(['status' => 1, 'is_menu' => 0, 'sign' => ['<>', '']])->column('sign');
+        $power = Db::name('admin_power')->where(['status' => 1, 'is_menu' => 0, 'sign' => ['<>', '']])->whereIn('id', $powerIds)->column('sign');
         return $this->success(['menu' => $menu, 'power' => $power]);
     }
 

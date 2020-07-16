@@ -57,7 +57,7 @@ class Auth
             'exp' => time() + 86400 * 3,  //过期时间
             'uid' => $user['id']
         ]);
-        Cookie::set(self::COOKIE_NAME, $token, 3);
+        Cookie::set(self::COOKIE_NAME, $token);
         return AdminUser::dealInfo($user);;
     }
 }

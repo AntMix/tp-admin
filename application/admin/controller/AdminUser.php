@@ -62,7 +62,10 @@ class AdminUser extends Base
             'status' => $this->request->post('status', 0),
         ];
         $role = $this->request->post('role');
-        $role && $role = explode(',', $role);
+        if (!$role) {
+            return $this->error('必须设置用户组');
+        }
+        $role = explode(',', $role);
         if (!AuthModel::checkNameFormat($data['name'])) {
             return $this->error('用户名格式错误');
         }

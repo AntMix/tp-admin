@@ -33,7 +33,7 @@ class Base extends BaseController
             $user = AdminUser::dealInfo($user);
         }
         if ($user) {
-            $this->uid = $user['uid'];
+            $this->uid = $user['id'];
             $this->user = $user;
         }
     }

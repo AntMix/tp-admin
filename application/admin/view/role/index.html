@@ -50,6 +50,7 @@
 
         document.getElementById('add').addEventListener('click', () => {
             kit.edit('新增', './edit', (iframe) => {
+                kit.reloadMenu()
                 tableIns.reload()
             })
         })
@@ -71,6 +72,7 @@
             switch (obj.event) {
                 case 'edit':
                     kit.edit('编辑', './edit?id=' + data.id, (iframe) => {
+                        kit.reloadMenu()
                         tableIns.reload()
                     })
                     break;

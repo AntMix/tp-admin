@@ -10,7 +10,7 @@ class AdminUser extends BaseModel
 
     public static function getNormalUser($id, $field = '*')
     {
-        return self::where('id', $id)->where(self::$normal)->field($field)->find();
+        return self::where('id', $id)->where(self::$normal)->field($field)->find()->toArray();
     }
 
     public static function dealInfo($user)
