@@ -44,8 +44,9 @@ class Auth
         return false;
     }
 
-    public static function login($name, $password)
+    public static function login($name, $password, $expire)
     {
+        $time = time();
         $password = self::password($password);
         $user = AdminUser::where(['name' => $name, 'password' => $password])->where(AdminUser::$normal)->find();
         if (!$user) {
@@ -53,11 +54,26 @@ class Auth
         }
         $token = \JWT::getToken([
             'iss' => 'roopto',  //该JWT的签发者
-            'iat' => time(),  //签发时间
-            'exp' => time() + 86400 * 3,  //过期时间
+            'iat' => $time,  //签发时间
+            'exp' => $time + $expire,  //过期时间
             'uid' => $user['id']
         ]);
-        Cookie::set(self::COOKIE_NAME, $token);
+        Cookie::set(self::COOKIE_NAME, $token, [
+            // cookie 名称前缀
+            'prefix'    => '',
+            // cookie 保存时间
+            'expire'    => $expire,
+            // cookie 保存路径
+            'path'      => '/',
+            // cookie 有效域名
+            'domain'    => '',
+            //  cookie 启用安全传输
+            'secure'    => false,
+            // httponly设置
+            'httponly'  => true,
+            // 是否使用 setcookie
+            'setcookie' => true,
+        ]);
         return AdminUser::dealInfo($user);;
     }
 }

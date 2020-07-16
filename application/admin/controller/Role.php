@@ -43,10 +43,7 @@ class Role extends Base
     {
         $id = $this->request->get('id');
         $data = [];
-        $data['list'] = Db::name('admin_power')->field('id,name,pid')->where('status', 1)->select();
-        foreach ($data['list'] as &$value) {
-            $value['checkArr'] = ['type' => 0, 'checked' => 0];
-        }
+        $data['list'] = Db::name('admin_power')->field('id,name,pid,icon,is_menu')->where('status', 1)->select();
         $data['checked'] = Db::name('admin_role_power')->where('role_id', $id)->column('power_id');
         $this->success($data);
     }
@@ -60,6 +57,9 @@ class Role extends Base
             'name' => $this->request->post('name'),
             'status' => $this->request->post('status', 0),
         ];
+        if ($id == 1 && $data['status'] == 0) {
+            return $this->error('无法变更超级管理员状态');
+        }
         Db::startTrans();
         $res1 = $res2 = $res3 = false;
         if ($id) {

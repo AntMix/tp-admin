@@ -57,7 +57,7 @@ class Base extends BaseController
         if ($powerId) {
             $access = Db::name('admin_role_power')->whereIn('role_id', $this->roleIds)->where('power_id', $powerId['id'])->find();
             if (!$access) {
-                abort(404);
+                abort(403);
             }
         }
     }

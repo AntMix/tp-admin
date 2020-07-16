@@ -16,10 +16,12 @@ class Auth extends BaseController
     {
         $name = $this->request->post('name');
         $password = $this->request->post('password');
+        $remember = $this->request->post('remember');
         if (!$name || !$password) {
             return $this->error('参数错误');
         }
-        $user = \app\admin\model\Auth::login($name, $password);
+        $expire = $remember ? 86400 * 7 : 86400 * 1;
+        $user = \app\admin\model\Auth::login($name, $password, $expire);
         if ($user) {
             return $this->success(['link' => '/admin/index', 'user' => $user], '登录成功');
         }

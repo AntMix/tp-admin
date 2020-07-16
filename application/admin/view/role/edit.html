@@ -45,25 +45,41 @@
             })
         }
         kit.get('./power', { id: ID }, { msg: false }).done((res) => {
+            res.data.list.forEach(v => {
+                if (v.icon === '') {
+                    if (v.is_menu !== 0) {
+                        v.icon = window.config.defaultIcon
+                    } else {
+                        v.icon = 'layui-icon-subtraction'
+                    }
+                }
+                v.icon = 'layui-icon ' + v.icon
+                v.checkArr = { type: 0, checked: 0 };
+            });
             let elementId = ''
-            dtree.render({
+            let dtreeObj = dtree.render({
                 elem: '#' + powerId,
                 data: res.data.list,
                 dataStyle: 'layuiStyle',
                 dataFormat: "list",
                 initLevel: 5,
-                response: { message: 'msg', statusCode: 0, parentId: 'pid', title: 'name' },
+                response: { message: 'msg', statusCode: 0, parentId: 'pid', title: 'name', iconClass: 'icon' },
                 checkbar: true,
                 checkbarType: "self",
                 menubar: true,
                 menubarTips: {
-                    group: ["moveDown", "moveUp", "refresh", "checkAll", "unCheckAll", "invertAll"]
+                    group: ['moveDown', 'moveUp', 'refresh', 'checkAll', 'unCheckAll', 'invertAll']
                 },
+                skin: 'laySimple',
                 done: function (result, $ul, first) {
                     if (first) {
                         dtree.chooseDataInit(powerId, res.data.checked.join(','))
                     }
                 }
+            });
+            // 绑定节点点击事件
+            dtree.on('node(' + powerId + ')', function (obj) {
+                dtreeObj.clickNodeCheckbar(obj.param.nodeId);// 点击节点选中复选框
             });
         })
         form.on('submit(submit)', function (data) {
