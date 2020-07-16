@@ -1,5 +1,5 @@
 window.config = {}
-window.config.defaultIcon = 'layui-icon-home'
+window.config.defaultIcon = 'layui-icon-circle'
 window.config.defaultTitle = '默认标题'
 window.config.tabMenuName = 'admin-TabMenu'
 window.config.powerItemName = 'admin-PowerList'

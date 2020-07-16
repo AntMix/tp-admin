@@ -97,6 +97,9 @@ class Role extends Base
     public function changeStatus()
     {
         $id = $this->request->request('id');
+        if ($id == 1) {
+            return $this->error('无法变更超级管理员状态');
+        }
         $res = Db::execute('update admin_role set status=abs(status-1) where id = (:id)', ['id' => $id]);
         if ($res !== false) {
             return $this->success();
