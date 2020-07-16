@@ -21,7 +21,7 @@
 			</form>
 		</div>
 		<!--数据表格-->
-		<table class="layui-hide" id="tableId" lay-filter="tableId" style="color: #dadada4f;"></table>
+		<table class="layui-hide" id="tableId" lay-filter="tableId" style="color: #dadada4f"></table>
 	</div>
 </body>
 <!-- 头工具栏模板 -->
@@ -48,8 +48,8 @@
 		const form = layui.form
 		const laydate = layui.laydate
 
-		laydate.render({ elem: '#startTime', type: 'datetime', trigger: 'click' });
-		laydate.render({ elem: '#endTime', type: 'datetime', trigger: 'click' });
+		laydate.render({ elem: '#startTime', type: 'datetime', trigger: 'click' })
+		laydate.render({ elem: '#endTime', type: 'datetime', trigger: 'click' })
 
 		let tableIns = table.render({
 			elem: '#tableId',
@@ -71,21 +71,35 @@
 				{ title: '操作', width: 120, align: 'center', fixed: 'right', templet: '#operationTpl' }
 			]],
 			done: () => { initPower() },
-		});
+		})
 
+		table.on('tool(tableId)', function (obj) {
+			let data = obj.data
+			switch (obj.event) {
+				case 'edit':
+					edit('编辑', './edit?id=' + data.id)
+					break
+				case 'del':
+					kit.confirm(`确认删除 ${data.id}-${data.name}？`, './delete', { id: data.id }, obj)
+					break
+			}
+		})
 		document.getElementById('add').addEventListener('click', () => {
-			kit.edit('新增', './edit', (iframe) => {
+			edit('新增', './edit')
+		})
+		function edit(title, url) {
+			kit.edit(title, url, (iframe) => {
 				tableIns.reload()
 			})
-		})
+		}
 
 		form.on('submit(search)', function (data) {
 			tableIns.reload({
 				where: data.field,
 				page: { curr: 1 }
-			});
+			})
 			return false
-		});
+		})
 
 		form.on('switch(statusSwitch)', (obj) => {
 			kit.formSwitch('./changeStatus', { id: obj.value }, obj)
@@ -95,73 +109,26 @@
 			let data = obj.data
 			switch (obj.event) {
 				case 'batchEnabled':
-					batchEnabled();
-					break;
+					batchEnabled()
+					break
 				case 'batchDisabled':
-					batchDisabled();
-					break;
+					batchDisabled()
+					break
 				case 'batchDel':
-					batchDel();
-					break;
+					batchDel()
+					break
 			}
-		});
-		table.on('tool(tableId)', function (obj) {
-			let data = obj.data
-			switch (obj.event) {
-				case 'edit':
-					kit.edit('编辑', './edit?id=' + data.id, (iframe) => {
-						tableIns.reload()
-					})
-					break;
-				case 'del':
-					kit.confirm(`确认删除 ${data.id}-${data.name}？`, './delete', { id: data.id }, obj)
-					break;
-			}
-		});
-
+		})
 		function batchEnabled() {
-			okLayer.confirm('确定要批量启用吗？', function (index) {
-				layer.close(index);
-				let idsStr = okUtils.tableBatchCheck(table);
-				if (idsStr) {
-					okUtils.ajax('/user/normalUser', 'put', { idsStr: idsStr }, true).done(function (response) {
-						console.log(response);
-						okUtils.tableSuccessMsg(response.msg);
-					}).fail(function (error) {
-						console.log(error)
-					});
-				}
-			});
+			kit.batchConfirm('确定要批量启用吗？', './batchEnable', {}, tableIns, () => { tableIns.reload() })
 		}
 
 		function batchDisabled() {
-			okLayer.confirm('确定要批量停用吗？', function (index) {
-				layer.close(index);
-				let idsStr = okUtils.tableBatchCheck(table);
-				if (idsStr) {
-					okUtils.ajax('/user/stopUser', 'put', { idsStr: idsStr }, true).done(function (response) {
-						console.log(response);
-						okUtils.tableSuccessMsg(response.msg);
-					}).fail(function (error) {
-						console.log(error)
-					});
-				}
-			});
+			kit.batchConfirm('确定要批量停用吗？', './batchDisabled', {}, tableIns, () => { tableIns.reload() })
 		}
 
 		function batchDel() {
-			okLayer.confirm('确定要批量删除吗？', function (index) {
-				layer.close(index);
-				let idsStr = okUtils.tableBatchCheck(table);
-				if (idsStr) {
-					okUtils.ajax('/user/deleteUser', 'delete', { idsStr: idsStr }, true).done(function (response) {
-						console.log(response);
-						okUtils.tableSuccessMsg(response.msg);
-					}).fail(function (error) {
-						console.log(error)
-					});
-				}
-			});
+			kit.batchConfirm('确定要批量删除吗？', './batchDel', {}, tableIns, () => { tableIns.reload() })
 		}
 	})
 </script>

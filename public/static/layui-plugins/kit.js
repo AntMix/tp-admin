@@ -127,20 +127,39 @@ layui.define(['layer', 'form'], function (exprots) {
        * @param content
        * @param yesFunction
       */
-      confirm: function (title, url, params, obj = null, callback = false) {
+      confirm: function (title, url, params, obj = null, callback) {
          layer.confirm(title, { icon: 3, title: '提示' }, function (index) {
             kit.post(url, params).done((res) => {
                obj && obj.del()
                layer.close(index)
-               if (callback === true) {
-                  window.location.reload()
-               } else {
-                  callback
+               if (typeof callback == 'function') {
+                  callback()
                }
             }).fail(() => {
                layer.close(index)
             })
          })
+      },
+      batchConfirm: function (title, url, params, tableIns, callback) {
+         let ids = kit.tableBatchCheck(tableIns)
+         if (ids) {
+            params.ids = ids
+         }else{
+            return kit.sign('请选择数据')
+         }
+         kit.confirm(title, url, params, null, callback)
+      },
+      tableBatchCheck: function (tableIns) {
+         let checkStatus = layui.table.checkStatus(tableIns.config.id)
+         if (checkStatus.data.length) {
+            let ids = [];
+            checkStatus.data.forEach(value => {
+               ids.push(value.id)
+            })
+            return ids.join(',')
+         } else {
+            return false
+         }
       },
       open: function (title = '', url = '404.html', options = {}, submitCallback, pageCallback) {
          options = Object.assign({
@@ -218,7 +237,7 @@ layui.define(['layer', 'form'], function (exprots) {
        * @param {object} callbackParams
        */
       formSelect: function (element, url, params, parseData = {}, callback, callbackParams) {
-         kit.post(url, params, {msg : false}).done((res) => {
+         kit.post(url, params, { msg: false }).done((res) => {
             let html = kit.makeOption(res.data, parseData)
             element.insertAdjacentHTML('beforeend', html)
             if (typeof callback == 'function') {
@@ -250,24 +269,6 @@ layui.define(['layer', 'form'], function (exprots) {
                element[i].resize()
             }
          })
-      },
-      /**
-       * 主要用于针对表格批量操作操作之前的检查
-       * @param table
-       * @returns {string}
-       */
-      tableBatchCheck: function (table) {
-         let checkStatus = table.checkStatus("tableId")
-         let rows = checkStatus.data.length
-         if (rows > 0) {
-            let idsStr = ""
-            for (let i = 0; i < checkStatus.data.length; i++) {
-               idsStr += checkStatus.data[i].id + ","
-            }
-            return idsStr
-         } else {
-            layer.msg("未选择有效数据", { offset: "t", anim: 6 })
-         }
       },
 
       imgUpload: function (upload, url = '/hospital/method-upload', data = null) {

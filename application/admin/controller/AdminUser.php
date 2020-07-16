@@ -25,10 +25,10 @@ class AdminUser extends Base
         $endTime = $this->request->get('end_time');
         $queryTime = \Util::queryTime($startTime, $endTime, 'create_time');
         $where = [];
-        $name && $where['name'] = ['like' , "%$name%"];
-        $nick && $where['nick'] = ['like' , "%$nick%"];
-        $phone && $where['phone'] = ['like' , "%$phone%"];
-        $email && $where['email'] = ['like' , "%$email%"];
+        $name && $where['name'] = ['like', "%$name%"];
+        $nick && $where['nick'] = ['like', "%$nick%"];
+        $phone && $where['phone'] = ['like', "%$phone%"];
+        $email && $where['email'] = ['like', "%$email%"];
         $queryTime && $where['create_time'] = $queryTime;
         $id && $where = ['id' => $id];
         $data = Db::name('admin_user')->where($where)->page($page)->paginate($limit)->toArray();
@@ -109,7 +109,6 @@ class AdminUser extends Base
             Db::rollback();
             return $this->error();
         }
-
     }
 
     public function delete()
@@ -153,8 +152,7 @@ class AdminUser extends Base
 
     public function changePassword()
     {
-        // $id = $this->request->post('id');
-        $id = $this->uid;
+        $id = $this->request->post('id');
         $user = Db::name('admin_user')->where('id', $id)->find();
         if (!$user) {
             $this->error('没有查询到此用户');
@@ -169,6 +167,54 @@ class AdminUser extends Base
             return $this->error('密码格式错误');
         }
         $res = Db::name('admin_user')->where('id', $id)->update(['password' => $password]);
+        if ($res !== false) {
+            return $this->success();
+        } else {
+            return $this->error();
+        }
+    }
+
+    public function batchEnable()
+    {
+        $ids = $this->request->post('ids');
+        $ids && $ids = explode(',', $ids);
+        if (!$ids) {
+            return $this->error('操作失败 请选择数据');
+        }
+        unset($ids[array_search(1, $ids)]);
+        $res = Db::name('admin_user')->whereIn('id', $ids)->update(['status' => 1]);
+        if ($res !== false) {
+            return $this->success();
+        } else {
+            return $this->error();
+        }
+    }
+
+    public function batchDisabled()
+    {
+        $ids = $this->request->post('ids');
+        $ids && $ids = explode(',', $ids);
+        if (!$ids) {
+            return $this->error('操作失败 请选择数据');
+        }
+        unset($ids[array_search(1, $ids)]);
+        $res = Db::name('admin_user')->whereIn('id', $ids)->update(['status' => 0]);
+        if ($res !== false) {
+            return $this->success();
+        } else {
+            return $this->error();
+        }
+    }
+
+    public function batchDel()
+    {
+        $ids = $this->request->post('ids');
+        $ids && $ids = explode(',', $ids);
+        if (!$ids) {
+            return $this->error('操作失败 请选择数据');
+        }
+        unset($ids[array_search(1, $ids)]);
+        $res = Db::name('admin_user')->whereIn('id', $ids)->update(['status' => -1]);
         if ($res !== false) {
             return $this->success();
         } else {
