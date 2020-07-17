@@ -1,5 +1,5 @@
-let  str = 'fsdfds'
-
-if (!new RegExp("^[a-zA-Z0-9_\s]+$").test(str)) {
-    console.log('用户名不能有特殊字符');
+for (var i = 0; i < 10; i++) {
+    setTimeout(() => {
+        console.log(i);
+    }, 0);
 }

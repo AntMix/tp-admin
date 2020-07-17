@@ -36,6 +36,7 @@
 <script type="text/html" id="operationTpl">
 	<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
 	<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+	<a class="layui-btn layui-btn-xs layui-btn-normal power-item" lay-event="changePassword" power="adminUser:changePassword">更改密码</a>
 </script>
 <!-- 启用|停用模板 -->
 <script type="text/html" id="statusTpl">
@@ -68,7 +69,7 @@
 				{ field: 'email', title: '邮箱' },
 				{ field: 'create_time', title: '创建时间', width: 160, templet: "<div>{{layui.kit.toDateTime(d.create_time)}}</div>" },
 				{ field: 'update_time', title: '更新时间', width: 160, templet: "<div>{{layui.kit.toDateTime(d.update_time)}}</div>" },
-				{ title: '操作', width: 120, align: 'center', fixed: 'right', templet: '#operationTpl' }
+				{ title: '操作', width: 200, align: 'center', fixed: 'right', templet: '#operationTpl' }
 			]],
 			done: () => { initPower() },
 		})
@@ -81,6 +82,13 @@
 					break
 				case 'del':
 					kit.confirm(`确认删除 ${data.id}-${data.name}？`, './delete', { id: data.id }, obj)
+					break
+				case 'changePassword':
+					layer.prompt({title : '请输入新密码'}, function (value, index, elem) {
+						kit.post('./changePassword', {id : data.id, password : value}).done(() => {
+							layer.close(index);
+						})
+					});
 					break
 			}
 		})

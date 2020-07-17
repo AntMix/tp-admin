@@ -3,7 +3,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\AdminUser;
-use app\admin\model\Auth as AuthModel;
+use app\admin\model\Auth;
 use app\common\controller\BaseController;
 use JWT;
 use think\Db;
@@ -23,7 +23,7 @@ class Base extends BaseController
 
     protected function _initUser()
     {
-        $token = $this->request->cookie(AuthModel::COOKIE_NAME);
+        $token = $this->request->cookie(Auth::COOKIE_NAME);
         if(!$token){
             $this->redirect($this->loginPage);
         }

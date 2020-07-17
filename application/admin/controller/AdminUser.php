@@ -3,7 +3,7 @@
 namespace app\admin\controller;
 
 use think\Db;
-use app\admin\model\Auth as AuthModel;
+use app\admin\model\Auth;
 
 class AdminUser extends Base
 {
@@ -66,10 +66,10 @@ class AdminUser extends Base
             return $this->error('必须设置用户组');
         }
         $role = explode(',', $role);
-        if (!AuthModel::checkNameFormat($data['name'])) {
+        if (!Auth::checkNameFormat($data['name'])) {
             return $this->error('用户名格式错误');
         }
-        if (!AuthModel::checkNickFormat($data['nick'])) {
+        if (!Auth::checkNickFormat($data['nick'])) {
             return $this->error('昵称格式错误');
         }
         $time = time();
@@ -80,7 +80,7 @@ class AdminUser extends Base
             $res1 = Db::name('admin_user')->where('id', $id)->update($data);
         } else {
             $data['create_time'] = $time;
-            $data['password'] = AuthModel::password($this->request->post('password'));
+            $data['password'] = Auth::password($this->request->post('password'));
             if (!$data['password']) {
                 return $this->error('密码格式错误');
             }
@@ -155,14 +155,10 @@ class AdminUser extends Base
         $id = $this->request->post('id');
         $user = Db::name('admin_user')->where('id', $id)->find();
         if (!$user) {
-            $this->error('没有查询到此用户');
-        }
-        $oldPass = $this->request->post('old_pass');
-        if (!AuthModel::password($oldPass, $user['password'])) {
-            $this->error('旧密码错误');
+            return $this->error('没有查询到此用户');
         }
         $password = $this->request->post('password');
-        $password = AuthModel::password($password);
+        $password = Auth::password($password);
         if (!$password) {
             return $this->error('密码格式错误');
         }
