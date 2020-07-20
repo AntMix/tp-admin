@@ -4,17 +4,42 @@ namespace app\admin\controller;
 
 use think\Db;
 use app\admin\model\Auth;
+use app\admin\model\AdminUser;
 
-class UserCenter extends Base
+class Personal extends Base
 {
     public function index()
     {
-        return $this->fetch('user_center/index');
+        return $this->fetch('personal/index');
+    }
+
+    public function info()
+    {
+        $data = AdminUser::dealInfo(AdminUser::getNormalUser($this->uid));
+        $this->success($data);
+    }
+
+    public function save()
+    {
+        $data = [
+            'nick' => $this->request->post('nick'),
+            'phone' => $this->request->post('phone'),
+            'email' => $this->request->post('email')
+        ];
+        if (!Auth::checkNickFormat($data['nick'])) {
+            return $this->error('昵称格式错误');
+        }
+        $res = Db::name('admin_user')->where('id', $this->uid)->update($data);
+        if ($res !== false) {
+            $this->success();
+        } else {
+            $this->error();
+        }
     }
 
     public function password()
     {
-        return $this->fetch('user_center/password');
+        return $this->fetch('personal/password');
     }
 
     public function changePassword()

@@ -5,7 +5,6 @@ window.config.tabMenuName = 'admin-TabMenu'
 window.config.powerItemName = 'admin-PowerList'
 window.config.layIdName = 'admin-LayId'
 
-
 layui.config({
    base: '/static/layui-plugins/' //假设这是你存放拓展模块的根目录
 })

@@ -28,9 +28,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">父级</label>
                 <div class="layui-input-block">
-                    <select name="pid" lay-filter="select" lay-search="" id="pid">
-                        <option value="0">请选择父级</option>
-                    </select>
+                    <div id="pid" class="xm-select-demo"></div>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -62,6 +60,7 @@
         </form>
     </div>
 </body>
+<script src="/static/layui-plugins/xm-select.js"></script>
 <script>
     const ID = getUrlParam('id')
     const PID = getUrlParam('pid')
@@ -76,17 +75,39 @@
             search: true,
             page: false
         });
-
-        kit.formSelect(document.getElementById('pid'), './list?is_menu=1', {}, { value: 'id', title: 'name', selected: PID }, () => {
+        let selectIns = {}
+        kit.get('./list?is_menu=1&children=1', {}, { msg: false }).done((res) => {
+            selectIns = xmSelect.render({
+                el: '#pid',
+                tips: '请选择父级',
+                filterable: true,
+                searchTips: '输入搜索',
+                data: res.data,
+                prop: {
+                    name: 'name',
+                    value: 'id',
+                },
+                initValue: res.data.checked,
+                model: { label: { type: 'text' } },
+                radio: true,
+                clickClose: true,
+                tree: {
+                    show: true,
+                    strict: false,
+                    expandedKeys: true,
+                },
+            })
             if (ID) {
                 kit.get('./info', { id: ID }, { msg: false }).done((res) => {
                     iconPicker.checkIcon('icon', res.data.icon);
                     form.val('form', res.data);
+                    res.data.pid && selectIns.setValue([res.data.pid])
                 })
             }
-        }, ID)
+        })
 
         form.on('submit(submit)', function (data) {
+            data.field.pid = selectIns.getValue('valueStr');
             kit.post('./save', data.field).done(() => {
                 kit.closeLayer(window.name)
             })

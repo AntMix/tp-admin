@@ -8,34 +8,13 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">用户名</label>
                 <div class="layui-input-block">
-                    <input type="text" name="name" lay-verify="name" required class="layui-input">
+                    <input type="text" name="name" lay-verify="name" required disabled readonly class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">昵称</label>
                 <div class="layui-input-block">
                     <input type="text" name="nick" lay-verify="nick" required class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item" id="pass" style="display: none;">
-                <div class="layui-inline">
-                    <label class="layui-form-label">密码</label>
-                    <div class="layui-input-inline">
-                        <input type="password" name="password" required lay-verify="password" id="password"
-                            class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">确认密码</label>
-                    <div class="layui-input-inline">
-                        <input type="password" lay-verify="re_pass" required class="layui-input">
-                    </div>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">角色</label>
-                <div class="layui-input-block" id="role">
-
                 </div>
             </div>
             <div class="layui-form-item">
@@ -50,43 +29,26 @@
                     <input type="email" name="email" class="layui-input">
                 </div>
             </div>
+
             <div class="layui-form-item">
-                <label class="layui-form-label">状态</label>
-                <div class="layui-input-block">
-                    <input type="checkbox" name="status" checked lay-skin="switch" value="1" lay-text="开启|关闭">
+                <div class="layui-input-block text-right">
+                    <button class="layui-btn" lay-filter="submit" lay-submit>保存</button>
+                    <button class="layui-btn layui-btn-primary" type="button">取消</button>
                 </div>
             </div>
-
-            <button id="submit" class="layui-btn" lay-submit lay-filter="submit" style="display: none"></button>
         </form>
     </div>
 </body>
-<script src="/static/layui-plugins/xm-select.js"></script>
 <script>
-    const ID = getUrlParam('id')
     layui.use(['kit', 'form'], function () {
         const kit = layui.kit
         const form = layui.form
 
-        if (ID) {
-            kit.get('./info', { id: ID }, { msg: false }).done((res) => {
-                form.val('form', res.data);
-            })
-            document.getElementById('pass').remove()
-        }
-        let selectIns = {};
-        kit.get('./role', { id: ID }, { msg: false }).done((res) => {
-            selectIns = xmSelect.render({
-                el: '#role',
-                tips: '请选择角色',
-                filterable: true,
-                searchTips: '输入搜索',
-                data: res.data.list,
-                initValue: res.data.checked
-            })
+        kit.get('./info', {}, { msg: false }).done((res) => {
+            form.val('form', res.data);
         })
+
         form.on('submit(submit)', function (data) {
-            data.field.role = selectIns.getValue('valueStr');
             kit.post('./save', data.field).done(() => {
                 kit.closeLayer(window.name)
             })
@@ -110,14 +72,6 @@
             nick: (value, item) => {
                 if (value.length > 20) {
                     return '用户名不能超过20个字符'
-                }
-            }, password: (value, item) => {
-                if (!/^[\S]{6,12}$/.test(value)) {
-                    return '密码必须6到12位，且不能出现空格'
-                }
-            }, re_pass: (value, item) => {
-                if (value != document.getElementById('password').value) {
-                    return '两次密码不一致'
                 }
             }
         });

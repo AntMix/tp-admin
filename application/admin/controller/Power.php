@@ -17,8 +17,54 @@ class Power extends Base
         $isMenu = $this->request->request('is_menu', 0);
         $where = ['status' => ['<>', -1]];
         $isMenu && $where['is_menu'] = 1;
+        $children = $this->request->request('children', 0);
         $data = Db::name('admin_power')->where($where)->select();
+        if ($children) {
+            $data = self::getMenu($data);
+        }
         return $this->success($data);
+    }
+
+    public static function getMenu($data)
+    {
+        $menu = [];
+        foreach ($data as $key => $value) {
+            $item = $value;
+            if ($value['pid'] === 0) {
+                unset($data[$key]);
+                $children = self::getMenuChildren($item, $data);
+                if ($children) {
+                    $item['children'] = $children;
+                } else {
+                    self::setMenuValue($item, 'href', $item['con'] . '/' . $item['func']);
+                }
+                $menu[] = $item;
+            }
+        }
+        return $menu;
+    }
+
+    protected static function getMenuChildren($parent, &$data)
+    {
+        $menu = [];
+        foreach ($data as $key => $value) {
+            $item = $value;
+            if ($value['pid'] === $parent['id']) {
+                unset($data[$key]);
+                $children = self::getMenuChildren($item, $data);
+                if ($children) {
+                    $item['children'] = $children;
+                }
+                self::setMenuValue($item, 'href', $item['con'] . '/' . $item['func']);
+                $menu[] = $item;
+            }
+        }
+        return $menu;
+    }
+
+    protected static function setMenuValue(&$item, $key, $value)
+    {
+        $item[$key] = $value;
     }
 
     public function edit()

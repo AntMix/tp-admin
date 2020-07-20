@@ -55,11 +55,10 @@
 					// d是当前行的数据
 					if (d.icon) {
 						return `<i class="layui-icon ${d.icon}"></i>`
-					}
-					if (d.children || d.is_menu) {  // 判断是否有子集
-						return '<i class="ew-tree-icon ew-tree-icon-folder"></i>';
+					} else if (!d.is_menu) {
+						return `<i class="layui-icon layui-icon-subtraction"></i>`
 					} else {
-						return '<i class="ew-tree-icon ew-tree-icon-file"></i>';
+						return `<i class="layui-icon ${window.config.defaultIcon}"></i>`;
 					}
 				}
 			}, cols: [[
@@ -69,8 +68,8 @@
 				{ field: 'con', title: '控制器' },
 				{ field: 'func', title: '方法' },
 				{ field: 'sign', title: '页面标识' },
-				{ field: 'is_menu', title: '菜单',width: 80, templet: '#isMenuTpl' },
-				{ field: 'status', title: '状态',width: 100, templet: '#statusTpl' },
+				{ field: 'is_menu', title: '菜单', width: 80, templet: '#isMenuTpl' },
+				{ field: 'status', title: '状态', width: 100, templet: '#statusTpl' },
 				{ title: '操作', width: 180, templet: '#operationTpl' },
 			]],
 			done: () => { initPower() },
@@ -113,7 +112,7 @@
 					})
 					break;
 				case 'del':
-					kit.confirm(`确认删除 ${data.id} - ${data.name}？`, './delete', {id : data.id}, obj)
+					kit.confirm(`确认删除 ${data.id} - ${data.name}？`, './delete', { id: data.id }, obj)
 					break;
 				case 'addChild':
 					kit.edit('新增', './edit?pid=' + data.id, (iframe) => {
