@@ -386,14 +386,18 @@ layui.define(["element", "jquery"], function (exports) {
    //刷新当前tab页
    tabList.prototype.refresh = function (_this, callback) {
       if (!($(_this).hasClass("refreshThis"))) {
-         $(_this).addClass("refreshThis");
-         $(".tab-list-content .layui-show").find("iframe")[0].contentWindow.location.reload(true);
-         if (typeof callback == "function") {
-            callback(tabList);
+         if ($(".tab-list-content .layui-show").find("iframe")[0] === undefined) {
+            return false;
+         } else {
+            $(_this).addClass("refreshThis");
+            $(".tab-list-content .layui-show").find("iframe")[0].contentWindow.location.reload(true);
+            if (typeof callback == "function") {
+               callback(tabList);
+            }
+            setTimeout(function () {
+               $(_this).removeClass("refreshThis");
+            }, 2000)
          }
-         setTimeout(function () {
-            $(_this).removeClass("refreshThis");
-         }, 2000)
       } else {
          layer.msg("客官请不要频繁点击哦！我会反应不过来的");
       }

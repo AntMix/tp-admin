@@ -2,6 +2,9 @@
 layui.define(['layer', 'form'], function (exprots) {
    const form = layui.form
    let kit = {
+      successCode: 0,
+      // msg弹窗默认消失时间
+      msgTime: 800,
       asyncOff: function () {
          $.ajaxSetup({
             async: false
@@ -30,9 +33,6 @@ layui.define(['layer', 'form'], function (exprots) {
       toDateTime: function (timestamp) {
          return kit.dateTime(timestamp, 'yyyy-MM-dd HH:mm:ss')
       },
-      successCode: 0,
-      // msg弹窗默认消失时间
-      msgTime: 800,
       // 绿色勾
       msg: function (content, options, callback) {
          content !== '' && layer.msg(content, options, callback)
@@ -144,7 +144,7 @@ layui.define(['layer', 'form'], function (exprots) {
          let ids = kit.tableBatchCheck(tableIns)
          if (ids) {
             params.ids = ids
-         }else{
+         } else {
             return kit.sign('请选择数据')
          }
          kit.confirm(title, url, params, null, callback)
@@ -267,58 +267,6 @@ layui.define(['layer', 'form'], function (exprots) {
          window.addEventListener("resize", function () {
             for (let i = 0; i < element.length; i++) {
                element[i].resize()
-            }
-         })
-      },
-
-      imgUpload: function (upload, url = '/hospital/method-upload', data = null) {
-         let load = null
-         upload.render({
-            elem: '.imgUpload',
-            url: url,
-            data: data, //上传接口
-            before: function (obj) {
-               load = layer.load(2)
-            },
-            done: function (data) {
-               if (data.code == 100) {
-                  let div = this.item.parents('div').eq(0)
-                  $(div).find('input').eq(0).val(data.result)
-                  $(div).find('img').eq(0).attr('src', data.result)
-                  $(div).find('img').eq(0).attr('height', '200px')
-                  if (!$(div).find('.del-photo').length) {
-                     $(div).append('<a class="layui-btn layui-btn-danger layui-btn-xs del-photo">删除</a>')
-                  }
-                  $(div).find('.del-photo').on('click', function () {
-                     $(div).find('input').eq(0).val('')
-                     $(div).find('img').eq(0).attr('src', '')
-                     $(div).find('img').eq(0).removeAttr('height')
-                     $(div).find('.del-photo').remove()
-                  })
-               } else {
-                  layer.msg(data.msg, { icon: 5 })
-               }
-               layer.close(load)
-            },
-            error: function () {
-
-            }
-         })
-      },
-      showImg: function (cls = 'form-img') {
-         cls = cls || 'form-img'
-         $('.' + cls).each(function (index, element) {
-            let div = element.parentNode
-            if ($(div).find('input').eq(0).val()) {
-               $(div).find('img').eq(0).attr('height', '200px')
-               $(div).find('img').eq(0).attr('src', $(div).find('input').eq(0).val())
-               $(div).append('<a class="layui-btn layui-btn-danger layui-btn-xs del-photo">删除</a>')
-               $(div).find('.del-photo').on('click', function () {
-                  $(div).find('input').eq(0).val('')
-                  $(div).find('img').eq(0).attr('src', '')
-                  $(div).find('img').eq(0).removeAttr('height')
-                  $(div).find('.del-photo').remove()
-               })
             }
          })
       }

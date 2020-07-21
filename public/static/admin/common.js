@@ -32,3 +32,29 @@ function initPower() {
 window.onload = () => {
    initPower()
 }
+function editImage(obj) {
+   let src = obj.parentNode.querySelector('img').getAttribute('src')
+   layui.use(['uploadImg'], function () {
+       const uploadImg = layui.uploadImg;
+       uploadImg.render({
+           area: ['900px', '600px'],
+           imgUrl: src,
+           url: "/user/upload.asp",
+           done: function (url) {
+               //更改图片src
+               obj.parentNode.childNodes["0"].src = url;
+           }
+       });
+   });
+}
+//图片删除
+function deleteImage(Obj) {
+   Obj.parentNode.parentNode.removeChild(Obj.parentNode);
+}
+//描述
+function editImageDescribe(obj) {
+   layer.prompt({ title: '请填新的描述，并确认', formType: 2 }, function (text, index) {
+       obj.innerHTML = text;
+       layer.close(index);
+   });
+}
