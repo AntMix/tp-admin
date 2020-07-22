@@ -105,46 +105,65 @@ layui.define(['upload', 'kit'], function (exports) {
 
     const imageListClass = 'image-list'
     const imageItemClass = 'image-item'
+    const uploadBtnElem = '.btn-upload-img'
+    const uploadListBtnElem = '.btn-upload-img-list'
 
     let uploadImg = {
-        init: function (options) {
+        opt: {
+            elem: uploadBtnElem,
+            name: '',
+            url: window.config.uploadImageUrl,
+            multiple: false,
+            move: false,
+            width: 150,
+            height: 113,
+            desc: false,
+            link: true,
+            del: true,
+            edit: true,
+            list: []
+        },
+        init: function (options = {}) {
+            options = Object.assign(uploadImg.opt, options)
+            uploadImg.showImg(options)
             upload.render({
-                elem: options.elem || '.btn-upload-img',
-                url: options.url || '/admin/file/upload',
-                multiple: options.multiple || false,
+                elem: options.elem,
+                url: options.url,
+                multiple: options.multiple,
                 before: function (obj) {
                     kit.load()
                 }, done: function (res) {
                     layer.closeAll('loading')
                     let div = this.item.parents('div').eq(0);
                     if (res.code === kit.successCode) {
+                        let src = res.data.src
                         if (options.multiple) {
-                            $(div).find('ul').eq(0).append(uploadImg.getImgItem(result));
+                            $(div).find('ul').eq(0).append(uploadImg.getImgItem(src));
                             if (options.move) {
                                 document.querySelectorAll(imageListClass).forEach(element => {
                                     uploadImg.move(element)
                                 })
                             }
                         } else {
-                            $(div).find('input').eq(0).val(res.data.src);
-                            $(div).find('ul').eq(0).html(uploadImg.getImgItem(res.data.src));
+                            $(div).find('input').eq(0).val(src);
+                            $(div).find('ul').eq(0).html(uploadImg.getImgItem(src));
                         }
-                        kit.success(data.msg)
+                        kit.success(res.msg)
                     } else {
-                        kit.error(data.msg)
+                        kit.error(res.msg)
                     }
                 }
             });
         },
+        initMulti: function (options = {}) {
+            options = Object.assign({ elem: uploadListBtnElem, multiple: true, move: true }, options)
+            uploadImg.init(options)
+        },
         getImgItem: function (url, options) {
-            options = Object.assign({
-                width: 150,
-                height: 113,
-                desc: false,
-                link: true,
-                del: true,
-                edit: true
-            }, options)
+            if (!url || Object.keys(url).length === 0) {
+                return ''
+            }
+            options = Object.assign(uploadImg.opt, options)
             let html = ''
             if (typeof url === 'array') {
                 url.forEach(element => {
@@ -155,40 +174,67 @@ layui.define(['upload', 'kit'], function (exports) {
                 html += '<li style="position:relative">'
                 html += `<img src="${url}" width="${options.width}" height="${options.height}" ${clickOpt}>`
                 options.desc && (html += '<div class="title_cover" onclick="editImageDescribe(this)"></div>')
-                options.edit && (html += '<div class="img_edit layui-icon layui-icon-edit" onclick="editImage(this)"></div>')
+                options.edit && (html += '<div class="img_edit layui-icon layui-icon-edit" onclick="layui.uploadImg.editImage(this)"></div>')
                 options.link && (html += '<div class="img-edit-src layui-icon layui-icon-link" onclick="editImageSrc(this)"></div>')
                 options.del && (html += '<div class="img_close" onclick="deleteImage(this)">X</div>')
+                options.name && (html += `<input type="hidden" name="${options.name}[]">`)
                 html += '</li>'
             }
             return html
         },
         showImg: function (options) {
-            let elem = options.elem || '.btn-upload-img'
-            let name = options.name
-            let cls = options.multiple ? imageListClass : imageItemClass
-            let btn = document.querySelector(elem)
+            options = Object.assign(uploadImg.opt, options)
+            let defCls = {
+                uploadBtnElem: imageItemClass,
+                uploadListBtnElem: imageListClass
+            }
+            let cls = ''
+            if (defCls[options.elem]) {
+                cls = defCls[options.elem]
+            } else {
+                cls = options.multiple ? imageListClass : imageItemClass
+            }
+            let btn = document.querySelector(options.elem)
+            let parent = btn.parentNode
             if (!btn) {
                 return false
             }
-            let imageList = btn.parentNode.querySelector('ul')
-            if (imageList == 'undefined') {
-                btn.parentNode.appendChild(document.createElement('ul').classList.add(cls))
+            if (parent.querySelector('ul') == null) {
+                parent.insertAdjacentHTML('afterbegin', `<ul class="${cls}"></ul>`)
             } else {
-                imageList.classList.add(cls)
+                parent.querySelector('ul').classList.add(cls)
             }
             if (options.multiple) {
-
+                if (options.list) {
+                    parent.querySelector('ul').html = uploadImg.getImgItem(options.list)
+                }
             } else {
-
+                let input = parent.querySelector('input').insertAdjacentHTML
+                if (input) {
+                    parent.querySelector('ul').html = uploadImg.getImgItem(input.value)
+                } else {
+                    parent.insertAdjacentHTML('afterbegin', `<input type="hidden" name="${options.name}" value="">`)
+                }
             }
+        },
+        editImage: function (obj) {
+            let src = obj.parentNode.querySelector('img').getAttribute('src')
+            layui.use(['uploadImg'], function () {
+                layui.uploadImg.edit({
+                    imgUrl: src,
+                    done: function (url) {
+                        obj.parentNode.querySelector('img').setAttribute('src', url)
+                        obj.parentNode.parentNode.parentNode.querySelector('input').value = url
+                    }
+                });
+            });
         },
         edit: function (options) {
             let saveW = options.saveW,
                 saveH = options.saveH,
                 mark = options.mark,
-                url = options.url,
                 imgUrl = options.imgUrl,
-                done = options.done;
+                done = options.done;// 回调
 
             if (document.getElementById('cropperNode') === null) {
                 document.body.insertAdjacentHTML('beforeend', html);
@@ -276,8 +322,8 @@ layui.define(['upload', 'kit'], function (exports) {
                         processData: false,
                         contentType: false,
                     });
-                    kit.post(url, formData).done((res) => {
-                        parent.layer.closeAll();
+                    kit.post(uploadImg.opt.url, formData).done((res) => {
+                        layer.closeAll();
                         return done(res.data.src);//返回图片src
                     })
                 }, 'image/jpeg');

@@ -33,9 +33,6 @@
                 <label class="layui-form-label">图片上传</label>
                 <div class="layui-input-block" style="display: flex;">
                     <input type="hidden" class="input-image" name="avatar">
-                    <ul class="image-item">
-
-                    </ul>
                     <div class="layui-btn btn-upload-img">
                         上传单图
                     </div>
@@ -44,9 +41,6 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">图片上传列表</label>
                 <div class="layui-input-block">
-                    <ul class="image-list">
-
-                    </ul>
                     <div class="layui-btn btn-upload-img-list">
                         上传多图
                     </div>
@@ -101,18 +95,8 @@
             }
         });
 
-        uploadImg.init({
-            multiple: false,
-            move: true
-        })
-        uploadImg.init({
-            elem: '.btn-upload-img-list',
-            multiple: true,
-            move: true
-        })
-        uploadImg.showImg({
-            elem: '.btn-upload-img-list'
-        })
+        uploadImg.init()
+        uploadImg.initMulti()
     });
 
 </script>

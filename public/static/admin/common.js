@@ -4,6 +4,7 @@ window.config.defaultTitle = '默认标题'
 window.config.tabMenuName = 'admin-TabMenu'
 window.config.powerItemName = 'admin-PowerList'
 window.config.layIdName = 'admin-LayId'
+window.config.uploadImageUrl = '/admin/file/upload'
 
 layui.config({
    base: '/static/layui-plugins/' //假设这是你存放拓展模块的根目录
@@ -33,18 +34,7 @@ window.onload = () => {
    initPower()
 }
 function editImage(obj) {
-   let src = obj.parentNode.querySelector('img').getAttribute('src')
-   layui.use(['uploadImg'], function () {
-       layui.uploadImg.edit({
-           area: ['900px', '600px'],
-           imgUrl: src,
-           url: "/user/upload.asp",
-           done: function (url) {
-               //更改图片src
-               obj.parentNode.childNodes["0"].src = url;
-           }
-       });
-   });
+
 }
 //图片删除
 function deleteImage(Obj) {
