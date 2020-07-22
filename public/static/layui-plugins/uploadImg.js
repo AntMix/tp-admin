@@ -143,7 +143,7 @@ layui.define(['upload', 'kit'], function (exports) {
                     if (that.config.multiple) {
                         $(div).find('ul').eq(0).append(that.getImgItem(src));
                         if (that.config.move) {
-                            document.querySelectorAll(imageListClass).forEach(element => {
+                            document.querySelectorAll('.' + imageListClass).forEach(element => {
                                 that.move(element)
                             })
                         }
@@ -177,7 +177,7 @@ layui.define(['upload', 'kit'], function (exports) {
                 html += that.getImgItem(element)
             })
         } else {
-            let clickOpt = url.substring(0, 5) != 'data:' ? `onclick="window.open('${url}')"` : ''
+            let clickOpt = url.substring(0, 5) != 'data:' ? `ondblclick="window.open('${url}')"` : ''
             html += '<li style="position:relative">'
             html += `<img src="${url}" width="${that.config.width}" height="${that.config.height}" ${clickOpt}>`
             that.config.desc && (html += '<div class="title_cover" onclick="uploadImg.prototype.editImageDescribe(this)"></div>')
@@ -263,9 +263,18 @@ layui.define(['upload', 'kit'], function (exports) {
     }
     // 图片地址
     uploadImg.prototype.editImageSrc = function (obj) {
-        layer.prompt({ title: '请输入图片地址', formType: 2 }, function (text, index) {
-            obj.parentNode.querySelector('img').setAttribute('src', text)
-            obj.parentNode.parentNode.parentNode.querySelector('input').value = text
+        let config = JSON.parse(window.atob(obj.parentNode.parentNode.getAttribute('config')))
+        layer.prompt({ title: '请输入图片地址', formType: 1 }, function (url, index) {
+            obj.parentNode.querySelector('img').setAttribute('src', url)
+            let input = null
+            if (config.multiple) {
+                input = obj.parentNode.querySelector('input')
+            } else {
+                input = obj.parentNode.parentNode.parentNode.querySelector('input')
+            }
+            if (input && input.getAttribute('type') != 'file') {
+                input.value = url
+            }
             layer.close(index);
         });
     }
