@@ -1,9 +1,11 @@
 body {
     padding: 2px 0 0 0;
 }
-.page-content{
+
+.page-content {
     padding: 5px;
 }
+
 .form-search {
     margin-top: 10px
 }
@@ -33,30 +35,37 @@ body {
 .btn-add {
     float: right;
 }
+
 .layui-tab-close {
     border-radius: 20px;
 }
+
 .power-item {
     display: none;
 }
 
-
 /*  */
-#addImg, #addZmImg, #addImgdz, #addImgpz, #addImgyy {
-    margin-left: 0 !important;
-    font-size: 144px;
-    line-height: 104px;
-    color: darkgrey
+
+.btn-upload-img {
+    margin-left: 10px;
+    margin-top: 40px;
 }
 
-#imgList, #imgZmList, #imgListdz, #imgListpz, #imgListyy {
-    width: 860px;
+.btn-upload-img-list {
+}
+
+.image-list {
     position: relative;
     margin: 10px auto;
-    min-height: 200px;
+    min-height: 110px;
 }
 
-#imgList li, #imgZmList li, #imgListdz li #imgListpz li #imgListyy li {
+.image-item{
+    width: 150px;
+    height: 113px;
+}
+
+.image-list li {
     width: 150px;
     height: 113px;
     float: left;
@@ -66,12 +75,12 @@ body {
     position: absolute;
 }
 
-#imgList li:hover, #imgZmList li:hover, #imgListdz li:hover, #imgListpz li:hover, #imgListyy li:hover {
+.image-list li:hover {
     border-color: #9a9fa4;
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.85);
 }
 
-#imgList .active, #imgZmList .active, #imgListdz .active, #imgListpz .active, #imgListyy .active {
+.image-list .active {
     border: 1px dashed red;
 }
 
@@ -130,7 +139,23 @@ body {
 .img_edit:hover {
     cursor: pointer;
 }
+.img-edit-src{
+    height: 20px;
+    background-color: rgba(0, 0, 0, .5);
+    position: absolute;
+    top: 0;
+    left: 22px;
+    width: 20px;
+    color: #fff;
+    line-height: 18px;
+    font-size: 14px;
+    text-align: center;
+}
+.img-edit-src:hover {
+    cursor: pointer;
+}
 .layui-btn.icon-btn {
     padding: 0 10px;
 }
+
 /*  */

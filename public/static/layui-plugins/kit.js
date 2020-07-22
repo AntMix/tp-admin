@@ -68,6 +68,9 @@ layui.define(['layer', 'form'], function (exprots) {
          typeof window.submitCallback == 'function' && window.submitCallback()
          parent.layer.close(parent.layer.getFrameIndex(name))
       },
+      load : function () {
+         return layer.load(2, { shade: 0.2 })
+      },
       /**
        * ajax()函数二次封装
        * @param {string} url 地址
@@ -87,7 +90,7 @@ layui.define(['layer', 'form'], function (exprots) {
             dataType: "json",
             beforeSend: function () {
                if (options.load) {
-                  loadIndex = layer.load(2, { shade: 0.2 })
+                  loadIndex = kit.load()
                }
             },
             success: function (data) {

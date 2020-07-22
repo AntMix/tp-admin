@@ -30,16 +30,26 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">图片上传</label>
-                    <div class="layui-input-inline">
-                        <div class="layui-upload-list layui-icon" id="addZmImg">
-                            &#xe64a;
-                        </div>
+                <label class="layui-form-label">图片上传</label>
+                <div class="layui-input-block" style="display: flex;">
+                    <input type="hidden" class="input-image" name="avatar">
+                    <ul class="image-item">
+
+                    </ul>
+                    <div class="layui-btn btn-upload-img">
+                        上传单图
                     </div>
                 </div>
-                <div class="">
-                    <ul id="imgZmList"></ul>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">图片上传列表</label>
+                <div class="layui-input-block">
+                    <ul class="image-list">
+
+                    </ul>
+                    <div class="layui-btn btn-upload-img-list">
+                        上传多图
+                    </div>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -91,32 +101,18 @@
             }
         });
 
-
-        upload.render({
-            elem: '#addZmImg',
-            url: '/user/upload.asp',
+        uploadImg.init({
+            multiple: false,
+            move: true
+        })
+        uploadImg.init({
+            elem: '.btn-upload-img-list',
             multiple: true,
-            before: function (obj) {
-                //预读本地文件示例，不支持ie8
-                obj.preview(function (index, file, result) {
-                    $('#imgZmList').append(`<li style="position:relative">
-                            <img name="imgZmList" src="${result}" width="150" height="113">
-                            <div class="title_cover" name="imgZmName" onclick="editImageDescribe(this)"></div>
-                            <div class="img_edit layui-icon" onclick="editImage(this)">&#xe642;</div>
-                            <div class="img_close" onclick="deleteImage(this)">X</div>
-                        </li>`);
-                    form.render();
-                    uploadImg.move("imgZmList");
-                });
-            }, done: function (res) {
-
-            }
-        });
-
-
-
-
-
+            move: true
+        })
+        uploadImg.showImg({
+            elem: '.btn-upload-img-list'
+        })
     });
 
 </script>

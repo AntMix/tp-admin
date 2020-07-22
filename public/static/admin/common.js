@@ -35,8 +35,7 @@ window.onload = () => {
 function editImage(obj) {
    let src = obj.parentNode.querySelector('img').getAttribute('src')
    layui.use(['uploadImg'], function () {
-       const uploadImg = layui.uploadImg;
-       uploadImg.render({
+       layui.uploadImg.edit({
            area: ['900px', '600px'],
            imgUrl: src,
            url: "/user/upload.asp",
@@ -53,8 +52,16 @@ function deleteImage(Obj) {
 }
 //描述
 function editImageDescribe(obj) {
-   layer.prompt({ title: '请填新的描述，并确认', formType: 2 }, function (text, index) {
+   layer.prompt({ title: '请填新的描述', formType: 2 }, function (text, index) {
        obj.innerHTML = text;
        layer.close(index);
    });
+}
+// 图片地址
+function editImageSrc(obj) {
+   layer.prompt({ title: '请输入图片地址', formType: 2 }, function (text, index) {
+      obj.parentNode.querySelector('img').setAttribute('src', text)
+      obj.parentNode.parentNode.parentNode.querySelector('input').value = text
+      layer.close(index);
+  });
 }

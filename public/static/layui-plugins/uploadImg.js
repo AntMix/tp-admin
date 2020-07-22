@@ -102,8 +102,87 @@ layui.define(['upload', 'kit'], function (exports) {
         </div>
     </div>
 </div>`;
+
+    const imageListClass = 'image-list'
+    const imageItemClass = 'image-item'
+
     let uploadImg = {
-        render: function (options) {
+        init: function (options) {
+            upload.render({
+                elem: options.elem || '.btn-upload-img',
+                url: options.url || '/admin/file/upload',
+                multiple: options.multiple || false,
+                before: function (obj) {
+                    kit.load()
+                }, done: function (res) {
+                    layer.closeAll('loading')
+                    let div = this.item.parents('div').eq(0);
+                    if (res.code === kit.successCode) {
+                        if (options.multiple) {
+                            $(div).find('ul').eq(0).append(uploadImg.getImgItem(result));
+                            if (options.move) {
+                                document.querySelectorAll(imageListClass).forEach(element => {
+                                    uploadImg.move(element)
+                                })
+                            }
+                        } else {
+                            $(div).find('input').eq(0).val(res.data.src);
+                            $(div).find('ul').eq(0).html(uploadImg.getImgItem(res.data.src));
+                        }
+                        kit.success(data.msg)
+                    } else {
+                        kit.error(data.msg)
+                    }
+                }
+            });
+        },
+        getImgItem: function (url, options) {
+            options = Object.assign({
+                width: 150,
+                height: 113,
+                desc: false,
+                link: true,
+                del: true,
+                edit: true
+            }, options)
+            let html = ''
+            if (typeof url === 'array') {
+                url.forEach(element => {
+                    html += uploadImg.getImgItem(element)
+                })
+            } else {
+                let clickOpt = url.substring(0, 5) != 'data:' ? `onclick="window.open('${url}')"` : ''
+                html += '<li style="position:relative">'
+                html += `<img src="${url}" width="${options.width}" height="${options.height}" ${clickOpt}>`
+                options.desc && (html += '<div class="title_cover" onclick="editImageDescribe(this)"></div>')
+                options.edit && (html += '<div class="img_edit layui-icon layui-icon-edit" onclick="editImage(this)"></div>')
+                options.link && (html += '<div class="img-edit-src layui-icon layui-icon-link" onclick="editImageSrc(this)"></div>')
+                options.del && (html += '<div class="img_close" onclick="deleteImage(this)">X</div>')
+                html += '</li>'
+            }
+            return html
+        },
+        showImg: function (options) {
+            let elem = options.elem || '.btn-upload-img'
+            let name = options.name
+            let cls = options.multiple ? imageListClass : imageItemClass
+            let btn = document.querySelector(elem)
+            if (!btn) {
+                return false
+            }
+            let imageList = btn.parentNode.querySelector('ul')
+            if (imageList == 'undefined') {
+                btn.parentNode.appendChild(document.createElement('ul').classList.add(cls))
+            } else {
+                imageList.classList.add(cls)
+            }
+            if (options.multiple) {
+
+            } else {
+
+            }
+        },
+        edit: function (options) {
             let saveW = options.saveW,
                 saveH = options.saveH,
                 mark = options.mark,
@@ -123,8 +202,6 @@ layui.define(['upload', 'kit'], function (exports) {
 
             let windowWidth = $(window).width()
             let windowHeight = $(window).height()
-            console.log(windowWidth);
-            console.log(windowHeight);
             options.width = windowWidth <= 1024 ? windowWidth * 0.9 : 800
             options.height = windowHeight <= 768 ? windowHeight * 0.95 : 550
 
@@ -206,8 +283,8 @@ layui.define(['upload', 'kit'], function (exports) {
                 }, 'image/jpeg');
             })
         },
-        move: function (obj) {
-            let oUl = document.getElementById(obj);
+        move: function (element) {
+            let oUl = element;
             let aLi = oUl.getElementsByTagName("li");
             let disX = 0;
             let disY = 0;
@@ -219,7 +296,7 @@ layui.define(['upload', 'kit'], function (exports) {
                 if (leftbz == 5) {
                     leftbz = 1;
                     topbz += 1;
-                    let fdiv = (topbz + 1) * 140;
+                    let fdiv = (topbz + 1) * 130;
                     oUl.style.height = fdiv + 'px';
                 }
                 else {
