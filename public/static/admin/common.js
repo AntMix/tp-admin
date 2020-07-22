@@ -33,25 +33,3 @@ function initPower() {
 window.onload = () => {
    initPower()
 }
-function editImage(obj) {
-
-}
-//图片删除
-function deleteImage(Obj) {
-   Obj.parentNode.parentNode.removeChild(Obj.parentNode);
-}
-//描述
-function editImageDescribe(obj) {
-   layer.prompt({ title: '请填新的描述', formType: 2 }, function (text, index) {
-       obj.innerHTML = text;
-       layer.close(index);
-   });
-}
-// 图片地址
-function editImageSrc(obj) {
-   layer.prompt({ title: '请输入图片地址', formType: 2 }, function (text, index) {
-      obj.parentNode.querySelector('img').setAttribute('src', text)
-      obj.parentNode.parentNode.parentNode.querySelector('input').value = text
-      layer.close(index);
-  });
-}
