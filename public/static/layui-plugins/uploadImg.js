@@ -208,7 +208,8 @@ layui.define(['upload', 'kit'], function (exports) {
             return false
         }
         if (parent.querySelector('ul') == null) {
-            parent.insertAdjacentHTML('afterbegin', `<ul class="${cls}" ajaxUrl="${that.config.url}" multi="${that.config.multiple ? 1 : 0}"></ul>`)
+            let config = window.btoa(JSON.stringify(that.config))
+            parent.insertAdjacentHTML('afterbegin', `<ul class="${cls}" config="${config}"></ul>`)
         } else {
             parent.querySelector('ul').classList.add(cls)
         }
@@ -231,14 +232,14 @@ layui.define(['upload', 'kit'], function (exports) {
         if (!src) {
             return false
         }
+        let config = JSON.parse(window.atob(obj.parentNode.parentNode.getAttribute('config')))
         uploadImg.prototype.edit({
             imgUrl: src,
-            ajaxUrl: obj.parentNode.parentNode.getAttribute('ajaxUrl'),
+            ajaxUrl: config.url,
             callback: (url) => {
                 obj.parentNode.querySelector('img').setAttribute('src', url)
-                let multiple = obj.parentNode.parentNode.getAttribute('multi')
                 let input = null
-                if (multiple) {
+                if (config.multiple) {
                     input = obj.parentNode.querySelector('input')
                 } else {
                     input = obj.parentNode.parentNode.parentNode.querySelector('input')
