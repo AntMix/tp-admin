@@ -142,7 +142,6 @@ layui.define(['upload', 'kit'], function (exports) {
             before: function (obj) {
                 kit.load()
             }, done: function (res) {
-                layer.closeAll('loading')
                 let div = this.item.parents('div').eq(0);
                 if (res.code === kit.successCode) {
                     let src = res.data.url
@@ -159,6 +158,8 @@ layui.define(['upload', 'kit'], function (exports) {
                 } else {
                     kit.error(res.msg)
                 }
+            }, allDone: function (obj) {
+                layer.closeAll('loading')
             }
         });
         return that;
