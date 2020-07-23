@@ -1,10 +1,16 @@
+let dragulaJs = document.createElement('script');
+dragulaJs.setAttribute('src', '/static/plugins/Sortable.min.js');
+document.body.appendChild(dragulaJs);
+
 let cropperCss = document.createElement('link');
 cropperCss.setAttribute('rel', 'stylesheet');
 cropperCss.setAttribute('href', '/static/plugins/cropper/cropper.min.css');
 document.body.appendChild(cropperCss);
+
 let cropperJs = document.createElement('script');
 cropperJs.setAttribute('src', '/static/plugins/cropper/cropper.min.js');
 document.body.appendChild(cropperJs);
+
 layui.define(['upload', 'kit'], function (exports) {
     const upload = layui.upload
     const kit = layui.kit
@@ -128,7 +134,7 @@ layui.define(['upload', 'kit'], function (exports) {
     uploadImg.prototype.init = function (options = {}) {
         let that = this
         $.extend(true, that.config, options);
-        this.showImg()
+        that.showImg()
         upload.render({
             elem: that.config.elem,
             url: that.config.url,
@@ -143,9 +149,7 @@ layui.define(['upload', 'kit'], function (exports) {
                     if (that.config.multiple) {
                         $(div).find('ul').eq(0).append(that.getImgItem(src));
                         if (that.config.move) {
-                            document.querySelectorAll('.' + imageListClass).forEach(element => {
-                                that.move(element)
-                            })
+                            that.Sortable = Sortable.create($(div).find('ul')[0]);
                         }
                     } else {
                         $(div).find('input').eq(0).val(src);
@@ -377,178 +381,8 @@ layui.define(['upload', 'kit'], function (exports) {
     }
 
     uploadImg.prototype.move = function (element) {
-        let oUl = element;
-        let aLi = oUl.getElementsByTagName("li");
-        let disX = 0;
-        let disY = 0;
-        let minZindex = 1;
-        let aPos = [];
-        let leftbz = 0;
-        let topbz = 0;
-        for (let i = 0; i < aLi.length; i++) {
-            if (leftbz == 5) {
-                leftbz = 1;
-                topbz += 1;
-                let fdiv = (topbz + 1) * 130;
-                oUl.style.height = fdiv + 'px';
-            }
-            else {
-                leftbz += 1;
-            }
-            //let l = aLi[i].offsetLeft;
-            //let t = aLi[i].offsetTop;
-            //此处注意，我是按照控件算出来的。尴尬。。。/(ㄒoㄒ)/~~
-            let l = 170 * (leftbz - 1) + 10;
-            let t = 130 * topbz;
-
-            aLi[i].style.top = t + "px";
-            aLi[i].style.left = l + "px";
-            aPos[i] = { left: l, top: t };
-            aLi[i].index = i;
-
-
-        }
-        for (let i = 0; i < aLi.length; i++) {
-            aLi[i].style.position = "absolute";
-            aLi[i].style.margin = 0;
-            setDrag(aLi[i]);
-        }
-        //拖拽
-        function setDrag(obj) {
-            obj.onmouseover = function () {
-                obj.style.cursor = "move";
-            }
-            obj.onmousedown = function (event) {
-                let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-                let scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
-                obj.style.zIndex = minZindex++;
-                //当鼠标按下时计算鼠标与拖拽对象的距离
-                disX = event.clientX + scrollLeft - obj.offsetLeft;
-                disY = event.clientY + scrollTop - obj.offsetTop;
-                document.onmousemove = function (event) {
-                    //当鼠标拖动时计算div的位置
-                    let l = event.clientX - disX + scrollLeft;
-                    let t = event.clientY - disY + scrollTop;
-                    obj.style.left = l + "px";
-                    obj.style.top = t + "px";
-                    /*for(let i=0;i<aLi.length;i++){
-                        aLi[i].className = "";
-                        if(obj==aLi[i])continue;//如果是自己则跳过自己不加红色虚线
-                        if(colTest(obj,aLi[i])){
-                            aLi[i].className = "active";
-                        }
-                    }*/
-                    for (let i = 0; i < aLi.length; i++) {
-                        aLi[i].className = "";
-                    }
-                    let oNear = findMin(obj);
-                    if (oNear) {
-                        oNear.className = "active";
-                    }
-                }
-                document.onmouseup = function () {
-                    document.onmousemove = null;//当鼠标弹起时移出移动事件
-                    document.onmouseup = null;//移出up事件，清空内存
-                    //检测是否普碰上，在交换位置
-                    let oNear = findMin(obj);
-                    if (oNear) {
-                        oNear.className = "";
-                        oNear.style.zIndex = minZindex++;
-                        obj.style.zIndex = minZindex++;
-                        startMove(oNear, aPos[obj.index]);
-                        startMove(obj, aPos[oNear.index]);
-                        //交换index
-                        oNear.index += obj.index;
-                        obj.index = oNear.index - obj.index;
-                        oNear.index = oNear.index - obj.index;
-                    } else {
-                        startMove(obj, aPos[obj.index]);
-                    }
-                }
-                clearInterval(obj.timer);
-                return false;//低版本出现禁止符号
-            }
-        }
-        function startMove(obj, json, callback) {
-            clearInterval(obj.timer);
-            obj.timer = setInterval(function () {
-                let isStop = true;
-                for (let attr in json) {
-                    let iCur = obj.currentStyle ? obj.currentStyle[attr] : getComputedStyle(obj, false)[attr];
-                    //判断运动的是不是透明度值
-                    if (attr == "opacity") {
-                        iCur = parseInt(parseFloat(iCur) * 100);
-                    } else {
-                        iCur = parseInt(iCur);
-                    }
-                    let speed = (json[attr] - iCur) / 8;
-                    //运动速度如果大于0则向下取整，如果小于0想上取整；
-                    speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
-                    //判断所有运动是否全部完成
-                    if (iCur != json[attr]) {
-                        isStop = false;
-                    }
-                    //运动开始
-                    if (attr == "opacity") {
-                        obj.style.filter = "alpha:(opacity:" + (json[attr] + speed) + ")";
-                        obj.style.opacity = (json[attr] + speed) / 100;
-                    } else {
-                        obj.style[attr] = iCur + speed + "px";
-                    }
-                }
-                //判断是否全部完成
-                if (isStop) {
-                    clearInterval(obj.timer);
-                    if (typeof callback == 'function') {
-                        callback()
-                    }
-                }
-            }, 30);
-        }
-        //碰撞检测
-        function colTest(obj1, obj2) {
-            let t1 = obj1.offsetTop;
-            let r1 = obj1.offsetWidth + obj1.offsetLeft;
-            let b1 = obj1.offsetHeight + obj1.offsetTop;
-            let l1 = obj1.offsetLeft;
-
-            let t2 = obj2.offsetTop;
-            let r2 = obj2.offsetWidth + obj2.offsetLeft;
-            let b2 = obj2.offsetHeight + obj2.offsetTop;
-            let l2 = obj2.offsetLeft;
-
-            if (t1 > b2 || r1 < l2 || b1 < t2 || l1 > r2) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        //勾股定理求距离
-        function getDis(obj1, obj2) {
-            let a = obj1.offsetLeft - obj2.offsetLeft;
-            let b = obj1.offsetTop - obj2.offsetTop;
-            return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-        }
-        //找到距离最近的
-        function findMin(obj) {
-            let minDis = 999999999;
-            let minIndex = -1;
-            for (let i = 0; i < aLi.length; i++) {
-                if (obj == aLi[i]) continue;
-                if (colTest(obj, aLi[i])) {
-                    let dis = getDis(obj, aLi[i]);
-                    if (dis < minDis) {
-                        minDis = dis;
-                        minIndex = i;
-                    }
-                }
-            }
-            if (minIndex == -1) {
-                return null;
-            } else {
-                return aLi[minIndex];
-            }
-        }
+        console.log(document.querySelectorAll(element));
+        dragula(document.querySelectorAll(element))
     }
 
     exports('uploadImg', (options = {}) => {
