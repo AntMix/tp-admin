@@ -139,7 +139,7 @@ layui.define(['upload', 'kit'], function (exports) {
                 layer.closeAll('loading')
                 let div = this.item.parents('div').eq(0);
                 if (res.code === kit.successCode) {
-                    let src = res.data.src
+                    let src = res.data.url
                     if (that.config.multiple) {
                         $(div).find('ul').eq(0).append(that.getImgItem(src));
                         if (that.config.move) {
@@ -184,7 +184,7 @@ layui.define(['upload', 'kit'], function (exports) {
             that.config.edit && (html += '<div class="img_edit layui-icon layui-icon-edit" onclick="uploadImg.prototype.editImage(this)"></div>')
             that.config.link && (html += '<div class="img-edit-src layui-icon layui-icon-link" onclick="uploadImg.prototype.editImageSrc(this)"></div>')
             that.config.del && (html += '<div class="img_close" onclick="uploadImg.prototype.deleteImage(this)">X</div>')
-            that.config.name && (html += `<input type="hidden" name="${that.config.name}[]">`)
+            that.config.name && (html += `<input type="hidden" name="${that.config.name}${that.config.multiple ? '[]' : ''}" value="${url}">`)
             html += '</li>'
         }
         return html
@@ -264,7 +264,7 @@ layui.define(['upload', 'kit'], function (exports) {
     // 图片地址
     uploadImg.prototype.editImageSrc = function (obj) {
         let config = JSON.parse(window.atob(obj.parentNode.parentNode.getAttribute('config')))
-        layer.prompt({ title: '请输入图片地址', formType: 1 }, function (url, index) {
+        layer.prompt({ title: '请输入图片地址', formType: 0 }, function (url, index) {
             obj.parentNode.querySelector('img').setAttribute('src', url)
             let input = null
             if (config.multiple) {
@@ -362,7 +362,7 @@ layui.define(['upload', 'kit'], function (exports) {
             cropperObj.getCroppedCanvas().toBlob((blob) => {
                 const formData = new FormData();
                 let timestamp = Date.parse(new Date());
-                formData.append('file', blob, timestamp + '.jpeg');
+                formData.append('file', blob, timestamp + '.jpg');
                 $.ajaxSetup({
                     async: false,
                     processData: false,
@@ -370,7 +370,7 @@ layui.define(['upload', 'kit'], function (exports) {
                 });
                 kit.post(ajaxUrl, formData).done((res) => {
                     layer.closeAll();
-                    return callback(res.data.src);//返回图片src
+                    return callback(res.data.url);//返回图片src
                 })
             }, 'image/jpeg');
         })

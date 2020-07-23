@@ -32,7 +32,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">图片上传</label>
                 <div class="layui-input-block" style="display: flex;">
-                    <input type="hidden" class="input-image" name="avatar">
+                    <input type="hidden" name="avatar">
                     <div class="layui-btn btn-upload-img">
                         上传单图
                     </div>
@@ -95,9 +95,14 @@
             }
         });
 
-        uploadImg()
         uploadImg({
-            multiple: true
+            elem: '.btn-upload-img',
+            // name: 'avatar'
+        })
+        uploadImg({
+            elem: '.btn-upload-img-list',
+            multiple: true,
+            name: 'multi'
         })
     });
 
