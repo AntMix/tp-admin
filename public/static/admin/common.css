@@ -7,13 +7,14 @@ body {
 }
 
 .form-search {
-    margin-top: 10px
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .form-search .layui-input {
     width: 200px;
     margin: 0 0px 5px 10px;
-    float: left;
 }
 
 .form-search .layui-btn {
@@ -33,7 +34,8 @@ body {
 }
 
 .btn-add {
-    float: right;
+    position: fixed;
+    right: 0;
 }
 
 .layui-tab-close {
