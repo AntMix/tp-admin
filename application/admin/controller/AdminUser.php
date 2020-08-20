@@ -137,7 +137,7 @@ class AdminUser extends Base
     public function changeStatus()
     {
         $id = $this->request->request('id');
-        $res = Db::execute('update admin_power set status=abs(status-1) where id = (:id)', ['id' => $id]);
+        $res = Db::execute('update admin_user set status=abs(status-1) where id = (:id)', ['id' => $id]);
         if ($res !== false) {
             return $this->success();
         } else {
