@@ -4,7 +4,7 @@ layui.define(['layer', 'form'], function (exprots) {
    let kit = {
       successCode: 0,
       // msg弹窗默认消失时间
-      msgTime: 800,
+      msgTime: 1000,
       asyncOff: function () {
          $.ajaxSetup({
             async: false

@@ -158,8 +158,11 @@ layui.define(['upload', 'kit'], function (exports) {
                 } else {
                     kit.error(res.msg)
                 }
+                layer.closeAll('loading')
             }, allDone: function (obj) {
                 layer.closeAll('loading')
+            }, error: function (obj) {
+                kit.error('', () => { layer.closeAll('loading') })
             }
         });
         return that;
