@@ -33,10 +33,11 @@ layui.define(['layer', 'form'], function (exprots) {
       toDateTime: function (timestamp) {
          return kit.dateTime(timestamp, 'yyyy-MM-dd HH:mm:ss')
       },
-      // 绿色勾
+      // 消息提示
       msg: function (content, options, callback) {
          content !== '' && layer.msg(content, options, callback)
       },
+      // 绿色勾
       success: function (content, callback) {
          kit.msg(content !== '' ? content : '操作成功', { icon: 1, time: kit.msgTime }, callback)
       },
