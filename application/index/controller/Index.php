@@ -10,6 +10,6 @@ class Index
 
     public function gitWebhook()
     {
-        exec("/bin/sh /var/www/tp-admin/git.sh");
+        return exec("/bin/sh /var/www/tp-admin/git.sh");
     }
 }
