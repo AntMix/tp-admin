@@ -74,6 +74,7 @@
             })
             document.getElementById('pass').remove()
         }
+        document.getElementById('pass').style.display = ''
         let selectIns = {};
         kit.get('./role', { id: ID }, { msg: false }).done((res) => {
             selectIns = xmSelect.render({
