@@ -7,4 +7,9 @@ class Index
     {
         return redirect('/admin/index');
     }
+
+    public function gitWebhook()
+    {
+        exec("/bin/sh /var/www/tp-admin/git.sh");
+    }
 }
