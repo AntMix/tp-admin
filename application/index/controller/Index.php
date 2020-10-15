@@ -5,6 +5,6 @@ class Index
 {
     public function Index()
     {
-        echo 'hello world';
+        return redirect('/admin/index');
     }
 }
